@@ -26,6 +26,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "usart.h"
+#include "gpio.h"
 
 #include <rcl/rcl.h>
 #include <rcl/error_handling.h>
@@ -192,7 +193,8 @@ void StartDefaultTask(void *argument)
     }
     
     msg.data++;
-    osDelay(10);
+    HAL_GPIO_TogglePin(USER_LED_GPIO_Port, USER_LED_Pin);
+    osDelay(500);
   }
   /* USER CODE END StartDefaultTask */
 }
