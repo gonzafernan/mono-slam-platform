@@ -46,6 +46,7 @@ Core/Src/stm32f4xx_hal_msp.c \
 Core/Src/stm32f4xx_hal_timebase_tim.c \
 app/src/app.c \
 app/src/imu.c \
+app/platform/freertos/freertos_osal_port.c \
 lib/device_drivers/src/icm20948_driver.c \
 lib/device_drivers/src/ak09916_driver.c \
 lib/device_drivers/platform/stm32f4/stm32f4_i2c_port.c \
@@ -149,6 +150,7 @@ C_INCLUDES =  \
 -IMiddlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F \
 -IDrivers/CMSIS/Device/ST/STM32F4xx/Include \
 -Iapp/include \
+-Iapp/platform/freertos \
 -Ilib/device_drivers/include \
 -IDrivers/CMSIS/Include
 

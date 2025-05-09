@@ -26,7 +26,6 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "gpio.h"
 #include "imu.h"
 #include "usart.h"
 
@@ -293,7 +292,7 @@ void StartDefaultTask(void* argument) {
 /* USER CODE BEGIN Application */
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
     if (GPIO_Pin == GPIO_PIN_12) {
-        HAL_GPIO_TogglePin(USER_LED_GPIO_Port, USER_LED_Pin);
+        imu_task_notify_from_isr();
     }
 }
 

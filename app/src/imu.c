@@ -4,17 +4,24 @@
  */
 
 #include <stdbool.h>
+#include <stddef.h>
 
 #include "ak09916_driver.h"
+#include "gpio.h"
 #include "icm20948_driver.h"
+#include "osal_port.h"
 
 /// IMU singleton
-struct {
+static struct {
     icm20948_t accel_gyro;
     ak09916_t magnetometer;
+    void *task_handle;
 } imu;
 
-int imu_init(void *imu_context, uint8_t device_address, uint32_t timeout) {
+static void imu_task(void *argument);
+
+int imu_init(void *imu_context, uint8_t device_address, uint32_t timeout,
+             void *task_attributes) {
     if (icm20948_init(&imu.accel_gyro, imu_context, device_address, timeout) <
         0) {
         return -1;
@@ -22,6 +29,7 @@ int imu_init(void *imu_context, uint8_t device_address, uint32_t timeout) {
     if (ak09916_init(&imu.magnetometer, imu_context, timeout) < 0) {
         return -1;
     }
+    imu.task_handle = osal_task_static_create(imu_task, NULL, task_attributes);
     return 0;
 }
 
@@ -46,4 +54,16 @@ int imu_read_gyroscope(int16_t *gyro_x, int16_t *gyro_y, int16_t *gyro_z) {
 
 int imu_read_magnetometer(int16_t *mag_x, int16_t *mag_y, int16_t *mag_z) {
     return ak09916_read_magnetometer(&imu.magnetometer, mag_x, mag_y, mag_z);
+}
+
+static void imu_task(void *argument) {
+    for (;;) {
+        // wait notification from imu (accel/gyro) data ready
+        osal_task_notify_wait(OSAL_MAX_DELAY);
+        HAL_GPIO_TogglePin(USER_LED_GPIO_Port, USER_LED_Pin);
+    }
+}
+
+void imu_task_notify_from_isr(void) {
+    osal_task_notify_from_isr(imu.task_handle);
 }

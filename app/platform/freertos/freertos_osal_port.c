@@ -1,0 +1,35 @@
+/**
+ * @file freertos_osal_port.c
+ * @brief FreeRTOS OSAL port implementation
+ *
+ * This file contains the implementation of the OSAL (Operating System
+ * Abstraction Layer) for FreeRTOS. It provides functions for task management,
+ * mutex handling, and semaphore handling.
+ *
+ */
+
+#include "FreeRTOS.h"
+#include "freertos_osal_port_config.h"
+#include "task.h"
+
+void *osal_task_static_create(void (*task_function)(void *), void *task_args,
+                             void *task_attributes) {
+    freertos_osal_task_static_attr_t *task_attr =
+        (freertos_osal_task_static_attr_t *)task_attributes;
+    TaskHandle_t xTask;
+    xTask = xTaskCreateStatic(
+        (TaskFunction_t)task_function, task_attr->name, task_attr->stack_size,
+        task_args, task_attr->priority, task_attr->stack, task_attr->cb_mem);
+    return (void *)xTask;
+}
+
+void osal_task_notify_from_isr(void *task_handle) {
+    TaskHandle_t xTask = (TaskHandle_t)task_handle;
+    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+    vTaskNotifyGiveFromISR(xTask, &xHigherPriorityTaskWoken);
+    portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+}
+
+void osal_task_notify_wait(uint32_t timeout) {
+    ulTaskNotifyTake(pdTRUE, timeout);
+}

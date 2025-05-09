@@ -19,9 +19,11 @@ extern "C" {
  * @param imu_context Pointer to the IMU context
  * @param device_address I2C device address of the IMU
  * @param timeout Timeout for I2C operations
+ * @param task_attributes Pointer to the task attributes
  * @return 0 on success, -1 on failure
  */
-int imu_init(void *imu_context, uint8_t device_address, uint32_t timeout);
+int imu_init(void *imu_context, uint8_t device_address, uint32_t timeout,
+             void *task_attributes);
 
 /**
  * @brief Check if the IMU device is available
@@ -56,6 +58,12 @@ int imu_read_gyroscope(int16_t *gyro_x, int16_t *gyro_y, int16_t *gyro_z);
  * @return 0 on success, -1 on failure
  */
 int imu_read_magnetometer(int16_t *mag_x, int16_t *mag_y, int16_t *mag_z);
+
+/**
+ * @brief Notify the IMU task from an ISR (Interrupt Service Routine)
+ * @note This function should be called from an ISR context
+ */
+void imu_task_notify_from_isr(void);
 
 #ifdef __cplusplus
 }
