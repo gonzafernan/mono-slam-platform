@@ -7,8 +7,10 @@
 #include <stddef.h>
 
 #include "ak09916_driver.h"
+#include "app_config.h"
 #include "gpio.h"
 #include "icm20948_driver.h"
+#include "imu.h"
 #include "osal_port.h"
 
 /// IMU singleton
@@ -16,6 +18,7 @@ static struct {
     icm20948_t accel_gyro;
     ak09916_t magnetometer;
     void *task_handle;
+    void *queue_handle;
 } imu;
 
 static void imu_task(void *argument);
@@ -30,6 +33,8 @@ int imu_init(void *imu_context, uint8_t device_address, uint32_t timeout,
         return -1;
     }
     imu.task_handle = osal_task_static_create(imu_task, NULL, task_attributes);
+    // imu.queue_handle =
+    //     osal_queue_static_create(1, sizeof(imu_sample_t), &imu_queue_attr);
     return 0;
 }
 

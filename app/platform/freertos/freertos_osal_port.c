@@ -10,10 +10,11 @@
 
 #include "FreeRTOS.h"
 #include "freertos_osal_port_config.h"
+#include "queue.h"
 #include "task.h"
 
 void *osal_task_static_create(void (*task_function)(void *), void *task_args,
-                             void *task_attributes) {
+                              void *task_attributes) {
     freertos_osal_task_static_attr_t *task_attr =
         (freertos_osal_task_static_attr_t *)task_attributes;
     TaskHandle_t xTask;
@@ -32,4 +33,13 @@ void osal_task_notify_from_isr(void *task_handle) {
 
 void osal_task_notify_wait(uint32_t timeout) {
     ulTaskNotifyTake(pdTRUE, timeout);
+}
+
+void *osal_queue_static_create(size_t queue_length, size_t item_size,
+                        void *queue_attributes) {
+    freertos_osal_queue_static_attr_t *queue_attr =
+        (freertos_osal_queue_static_attr_t *)queue_attributes;
+    QueueHandle_t xQueue;
+    xQueue = xQueueCreateStatic(queue_length, item_size, queue_attr->queue_buffer, queue_attr->cb_mem);
+    return (void *)xQueue;
 }

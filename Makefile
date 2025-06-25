@@ -45,6 +45,7 @@ Core/Src/stm32f4xx_it.c \
 Core/Src/stm32f4xx_hal_msp.c \
 Core/Src/stm32f4xx_hal_timebase_tim.c \
 app/src/app.c \
+app/src/app_config.c \
 app/src/imu.c \
 app/platform/freertos/freertos_osal_port.c \
 lib/device_drivers/src/icm20948_driver.c \

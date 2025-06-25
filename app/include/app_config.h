@@ -19,19 +19,13 @@ extern "C" {
 
 #define IMU_I2C_ADDRESS ICM20948_I2C_ADDRESS1  /// I2C address for the IMU
 #define IMU_I2C_TIMEOUT 1000                   /// Timeout for I2C operations
-#define IMU_TASK_STACK_SIZE 512                /// Stack size for the IMU task
+#define IMU_TASK_STACK_SIZE 512                /// Stack size for the IMU task9
 
-uint32_t
-    imu_stack_buffer[IMU_TASK_STACK_SIZE];  /// Buffer for the IMU task stack
-StaticTask_t imu_task_buffer;
+/// @brief IMU task attributes
+extern freertos_osal_task_static_attr_t imu_task_attr;
 
-freertos_osal_task_static_attr_t imu_task_attr = {
-    .name = "imu_task",                 /// Name of the IMU task
-    .stack_size = IMU_TASK_STACK_SIZE,  /// Stack size for the IMU task
-    .priority = osPriorityNormal,       /// Priority of the IMU task
-    .stack = imu_stack_buffer,          /// Pointer to the stack
-    .cb_mem = &imu_task_buffer,         /// Pointer to the control block memory
-};
+/// @brief IMU queue attributes
+extern freertos_osal_queue_static_attr_t imu_queue_attr;
 
 #ifdef __cplusplus
 }

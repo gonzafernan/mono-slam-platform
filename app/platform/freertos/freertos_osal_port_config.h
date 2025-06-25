@@ -24,6 +24,11 @@ typedef struct {
     StaticTask_t *cb_mem;  /// Pointer to the control block memory
 } freertos_osal_task_static_attr_t;
 
+typedef struct {
+    StaticQueue_t *cb_mem;  /// Pointer to the control block memory
+    uint8_t *queue_buffer;  /// Pointer to the queue buffer
+} freertos_osal_queue_static_attr_t;
+
 #ifdef __cplusplus
 }
 #endif

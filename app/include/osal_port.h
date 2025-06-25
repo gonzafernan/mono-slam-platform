@@ -43,6 +43,16 @@ void osal_task_notify_from_isr(void *task_handle);
  */
 void osal_task_notify_wait(uint32_t timeout);
 
+/**
+ * @brief Create a queue with static allocation.
+ * @param queue_length Length of the queue.
+ * @param item_size Size of each item in the queue.
+ * @param queue_attributes Pointer to the queue attributes structure.
+ * @return Handle to the created queue.
+ */
+void *osal_queue_static_create(size_t queue_length, size_t item_size,
+                        void *queue_attributes);
+
 #ifdef __cplusplus
 }
 #endif

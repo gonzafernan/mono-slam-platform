@@ -15,6 +15,23 @@ extern "C" {
 #include <stdint.h>
 
 /**
+ * @brief IMU sample structure
+ * This structure holds the data from the IMU sensors including
+ * accelerometer, gyroscope, and magnetometer.
+ */
+typedef struct {
+    double accel_x; /*!> Accelerometer X-axis data */
+    double accel_y; /*!> Accelerometer Y-axis data */
+    double accel_z; /*!> Accelerometer Z-axis data */
+    double gyro_x;  /*!> Gyroscope X-axis data */
+    double gyro_y;  /*!> Gyroscope Y-axis data */
+    double gyro_z;  /*!> Gyroscope Z-axis data */
+    double mag_x;   /*!> Magnetometer X-axis data */
+    double mag_y;   /*!> Magnetometer Y-axis data */
+    double mag_z;   /*!> Magnetometer Z-axis data */
+} imu_sample_t;
+
+/**
  * @brief IMU initialization
  * @param imu_context Pointer to the IMU context
  * @param device_address I2C device address of the IMU
