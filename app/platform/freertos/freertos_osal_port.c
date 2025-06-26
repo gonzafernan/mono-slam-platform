@@ -36,10 +36,21 @@ void osal_task_notify_wait(uint32_t timeout) {
 }
 
 void *osal_queue_static_create(size_t queue_length, size_t item_size,
-                        void *queue_attributes) {
+                               void *queue_attributes) {
     freertos_osal_queue_static_attr_t *queue_attr =
         (freertos_osal_queue_static_attr_t *)queue_attributes;
     QueueHandle_t xQueue;
-    xQueue = xQueueCreateStatic(queue_length, item_size, queue_attr->queue_buffer, queue_attr->cb_mem);
+    xQueue = xQueueCreateStatic(queue_length, item_size,
+                                queue_attr->queue_buffer, queue_attr->cb_mem);
     return (void *)xQueue;
+}
+
+void osal_queue_overwrite(void *queue_handle, void *item) {
+    QueueHandle_t xQueue = (QueueHandle_t)queue_handle;
+    xQueueOverwrite(xQueue, item);
+}
+
+int osal_queue_peek(void *queue_handle, void *item, uint32_t timeout) {
+    QueueHandle_t xQueue = (QueueHandle_t)queue_handle;
+    return (xQueuePeek(xQueue, item, timeout) == pdTRUE) ? 0 : -1;
 }

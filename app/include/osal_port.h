@@ -51,7 +51,24 @@ void osal_task_notify_wait(uint32_t timeout);
  * @return Handle to the created queue.
  */
 void *osal_queue_static_create(size_t queue_length, size_t item_size,
-                        void *queue_attributes);
+                               void *queue_attributes);
+
+/**
+ * @brief Overwrite an item in the queue.
+ * @param queue_handle Handle to the queue.
+ * @param item Pointer to the item to overwrite in the queue.
+ * Overwrite the oldest item in the queue with the new item.
+ */
+void osal_queue_overwrite(void *queue_handle, void *item);
+
+/**
+ * @brief Peek at the front item of the queue without removing it.
+ * @param queue_handle Handle to the queue.
+ * @param item Pointer to the buffer where the item will be stored.
+ * @param timeout Timeout in milliseconds for waiting for an item.
+ * @return 0 if successful, -1 if timeout occurred or queue is empty.
+ */
+int osal_queue_peek(void *queue_handle, void *item, uint32_t timeout);
 
 #ifdef __cplusplus
 }

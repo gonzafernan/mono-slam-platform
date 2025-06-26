@@ -77,6 +77,13 @@ int imu_read_gyroscope(int16_t *gyro_x, int16_t *gyro_y, int16_t *gyro_z);
 int imu_read_magnetometer(int16_t *mag_x, int16_t *mag_y, int16_t *mag_z);
 
 /**
+ * @brief Get a sample from the IMU
+ * @param sample Pointer to the imu_sample_t structure to store the sample data
+ * @param timeout Timeout for waiting for a sample
+ */
+void imu_get_sample(imu_sample_t *sample, uint32_t timeout);
+
+/**
  * @brief Notify the IMU task from an ISR (Interrupt Service Routine)
  * @note This function should be called from an ISR context
  */
