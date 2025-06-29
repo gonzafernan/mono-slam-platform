@@ -13,10 +13,19 @@ extern "C" {
 
 /**
  * @brief Application initialization
- * @param imu_context Pointer to the IMU context
+ * @param imu Pointer to the IMU context
+ * @param left_encoder Pointer to the left encoder context
+ * @param right_encoder Pointer to the right encoder context
  * @return 0 on success, -1 on failure
  */
-int app_init(void *imu_context);
+int app_init(void *imu, void *left_encoder, void *right_encoder);
+
+/**
+ * @brief Get the value of the right encoder
+ * @return The current value of the right encoder as a 32-bit unsigned integer
+ */
+uint32_t app_get_left_encoder_value(void);
+uint32_t app_get_right_encoder_value(void);
 
 #ifdef __cplusplus
 }
