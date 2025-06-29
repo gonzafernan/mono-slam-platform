@@ -8,13 +8,21 @@
 #include <rcl/rcl.h>
 #include <rclc/rclc.h>
 #include <sensor_msgs/msg/imu.h>
+#include <std_msgs/msg/u_int32.h>
 
+#include "app.h"
 #include "imu.h"
 #include "microros_transport_config.h"
 #include "osal_port.h"
 
 rcl_publisher_t imu_publisher;
 sensor_msgs__msg__Imu imu_msg;
+
+rcl_publisher_t encoder1_publisher;
+std_msgs__msg__UInt32 encoder1_msg;
+
+rcl_publisher_t encoder2_publisher;
+std_msgs__msg__UInt32 encoder2_msg;
 
 void transport_imu_init(void *context) {
     transport_context_t *transport_context = (transport_context_t *)context;
@@ -70,10 +78,6 @@ void transport_imu_init(void *context) {
 }
 
 void transport_imu_publish(void) {
-    rcl_ret_t ret = rcl_publish(&imu_publisher, &imu_msg, NULL);
-    if (ret != RCL_RET_OK) {
-        printf("Error publishing (line %d)\n", __LINE__);
-    }
     imu_sample_t sample;
     imu_get_sample(&sample, OSAL_MAX_DELAY);
 
@@ -87,7 +91,40 @@ void transport_imu_publish(void) {
     imu_msg.linear_acceleration_covariance[1] = sample.mag_y;
     imu_msg.linear_acceleration_covariance[2] = sample.mag_z;
 
-    // imu_msg.orientation.x = get_roll_from_accel(accel_x_d, accel_y_d,
-    // accel_z_d); imu_msg.orientation.y = get_pitch_from_accel(accel_x_d,
-    // accel_y_d, accel_z_d);
+    rcl_ret_t ret = rcl_publish(&imu_publisher, &imu_msg, NULL);
+    if (ret != RCL_RET_OK) {
+        printf("Error publishing (line %d)\n", __LINE__);
+    }
+}
+
+void transport_encoder_init(void *context) {
+    transport_context_t *transport_context = (transport_context_t *)context;
+
+    // publisher initialization
+    rclc_publisher_init_default(
+        &encoder1_publisher, transport_context->node,
+        ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, UInt32),
+        "encoder1_position");
+    encoder1_msg.data = 0;
+
+    rclc_publisher_init_default(
+        &encoder2_publisher, transport_context->node,
+        ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, UInt32),
+        "encoder2_position");
+    encoder2_msg.data = 0;
+}
+
+void transport_encoder_publish(void) {
+    encoder1_msg.data = (uint32_t)app_get_left_encoder_value();
+    encoder2_msg.data = (uint32_t)app_get_right_encoder_value();
+
+    rcl_ret_t ret = rcl_publish(&encoder1_publisher, &encoder1_msg, NULL);
+    if (ret != RCL_RET_OK) {
+        printf("Error publishing (line %d)\n", __LINE__);
+    }
+
+    ret = rcl_publish(&encoder2_publisher, &encoder2_msg, NULL);
+    if (ret != RCL_RET_OK) {
+        printf("Error publishing (line %d)\n", __LINE__);
+    }
 }

@@ -180,10 +180,12 @@ void StartDefaultTask(void *argument)
     // create app transport layer
     transport_context.node = &node;
     transport_imu_init((void *)&transport_context);
+    transport_encoder_init((void *)&transport_context);
 
     for (;;) {
         osDelay(100);
         transport_imu_publish();
+        transport_encoder_publish();
     }
   /* USER CODE END StartDefaultTask */
 }
