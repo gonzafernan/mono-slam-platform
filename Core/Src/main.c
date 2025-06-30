@@ -28,7 +28,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "app.h"
-#include "stm32f4_encoder_config.h"
+#include "stm32f4_encoder_port_config.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -49,11 +49,11 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-stm32f4_encoder_handle_t left_encoder = {
+stm32f4_encoder_handle_t port_encoder1 = {
     .htim = &htim3,
     .channels = TIM_CHANNEL_ALL,
 };
-stm32f4_encoder_handle_t right_encoder = {
+stm32f4_encoder_handle_t port_encoder2 = {
     .htim = &htim4,
     .channels = TIM_CHANNEL_ALL,
 };
@@ -106,7 +106,7 @@ int main(void)
   MX_TIM3_Init();
   MX_TIM4_Init();
   /* USER CODE BEGIN 2 */
-  if (app_init(&hi2c1, &left_encoder, &right_encoder) < 0) {
+  if (app_init(&hi2c1, &port_encoder1, &port_encoder2) < 0) {
     Error_Handler();
   }
   /* USER CODE END 2 */

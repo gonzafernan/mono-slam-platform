@@ -10,7 +10,10 @@
 extern "C" {
 #endif
 
-#include <stdint.h>
+typedef struct {
+    void *context;
+    double gear_ratio;  // Gear ratio to output shaft
+} encoder_t;
 
 /**
  * @brief Initializes the encoder module.
@@ -18,20 +21,20 @@ extern "C" {
  * This function initializes the encoder hardware and prepares it for operation.
  * It should be called before any other encoder functions are used.
  *
- * @param encoder_handle Pointer to the encoder handle structure.
+ * @param encoder Pointer to the encoder structure.
  * @return 0 on success, -1 on failure.
  */
-int encoder_init(void *encoder_handle);
+int encoder_init(encoder_t *encoder);
 
 /**
- * @brief Samples the current encoder value.
+ * @brief Samples the current encoder position.
  *
  * This function reads the current position of the encoder and returns it.
  *
- * @param encoder_handle Pointer to the encoder handle structure.
- * @return The current encoder value as a 32-bit unsigned integer.
+ * @param encoder Pointer to the encoder structure.
+ * @return The current encoder position in radians as a double.
  */
-uint32_t encoder_sample(void *encoder_handle);
+double encoder_sample_position(encoder_t *encoder);
 
 #ifdef __cplusplus
 }

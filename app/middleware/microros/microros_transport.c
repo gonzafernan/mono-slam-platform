@@ -8,7 +8,7 @@
 #include <rcl/rcl.h>
 #include <rclc/rclc.h>
 #include <sensor_msgs/msg/imu.h>
-#include <std_msgs/msg/u_int32.h>
+#include <std_msgs/msg/float32.h>
 
 #include "app.h"
 #include "imu.h"
@@ -19,10 +19,10 @@ rcl_publisher_t imu_publisher;
 sensor_msgs__msg__Imu imu_msg;
 
 rcl_publisher_t encoder1_publisher;
-std_msgs__msg__UInt32 encoder1_msg;
+std_msgs__msg__Float32 encoder1_msg;
 
 rcl_publisher_t encoder2_publisher;
-std_msgs__msg__UInt32 encoder2_msg;
+std_msgs__msg__Float32 encoder2_msg;
 
 void transport_imu_init(void *context) {
     transport_context_t *transport_context = (transport_context_t *)context;
@@ -103,20 +103,20 @@ void transport_encoder_init(void *context) {
     // publisher initialization
     rclc_publisher_init_default(
         &encoder1_publisher, transport_context->node,
-        ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, UInt32),
+        ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, Float32),
         "encoder1_position");
     encoder1_msg.data = 0;
 
     rclc_publisher_init_default(
         &encoder2_publisher, transport_context->node,
-        ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, UInt32),
+        ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, Float32),
         "encoder2_position");
     encoder2_msg.data = 0;
 }
 
 void transport_encoder_publish(void) {
-    encoder1_msg.data = (uint32_t)app_get_left_encoder_value();
-    encoder2_msg.data = (uint32_t)app_get_right_encoder_value();
+    encoder1_msg.data = (float)app_get_left_encoder_value();
+    encoder2_msg.data = (float)app_get_right_encoder_value();
 
     rcl_ret_t ret = rcl_publish(&encoder1_publisher, &encoder1_msg, NULL);
     if (ret != RCL_RET_OK) {
