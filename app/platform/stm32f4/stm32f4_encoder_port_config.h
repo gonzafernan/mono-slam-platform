@@ -1,10 +1,10 @@
 /**
- * @file stm32f4_encoder_config.h
+ * @file stm32f4_encoder_port_config.h
  * @brief Configuration file for STM32F4 encoder settings.
  */
 
-#ifndef STM32F4_ENCODER_CONFIG_H
-#define STM32F4_ENCODER_CONFIG_H
+#ifndef STM32F4_ENCODER_PORT_CONFIG_H
+#define STM32F4_ENCODER_PORT_CONFIG_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -22,4 +22,4 @@ typedef struct {
 }
 #endif
 
-#endif  // STM32F4_ENCODER_CONFIG_H
+#endif  // STM32F4_ENCODER_PORT_CONFIG_H

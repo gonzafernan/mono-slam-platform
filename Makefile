@@ -47,7 +47,8 @@ Core/Src/stm32f4xx_hal_timebase_tim.c \
 app/src/app.c \
 app/src/app_config.c \
 app/src/imu.c \
-app/platform/stm32f4/stm32f4_encoder.c \
+app/src/encoder.c \
+app/platform/stm32f4/stm32f4_encoder_port.c \
 app/middleware/freertos/freertos_osal_port.c \
 app/middleware/microros/microros_transport.c \
 lib/device_drivers/src/icm20948_driver.c \

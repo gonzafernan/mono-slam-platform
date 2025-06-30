@@ -21,11 +21,16 @@ extern "C" {
 int app_init(void *imu, void *left_encoder, void *right_encoder);
 
 /**
- * @brief Get the value of the right encoder
- * @return The current value of the right encoder as a 32-bit unsigned integer
+ * @brief Get the value of the left encoder
+ * @return The current value of the left encoder in radians
  */
-uint32_t app_get_left_encoder_value(void);
-uint32_t app_get_right_encoder_value(void);
+double app_get_left_encoder_value(void);
+
+/**
+ * @brief Get the value of the right encoder
+ * @return The current value of the right encoder in radians
+ */
+double app_get_right_encoder_value(void);
 
 #ifdef __cplusplus
 }
