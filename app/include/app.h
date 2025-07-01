@@ -14,11 +14,11 @@ extern "C" {
 /**
  * @brief Application initialization
  * @param imu Pointer to the IMU context
- * @param left_encoder Pointer to the left encoder context
- * @param right_encoder Pointer to the right encoder context
+ * @param port_encoder1 Pointer to the encoder 1 context
+ * @param port_encoder2 Pointer to the encoder 2 context
  * @return 0 on success, -1 on failure
  */
-int app_init(void *imu, void *left_encoder, void *right_encoder);
+int app_init(void *imu, void *port_encoder1, void *port_encoder2);
 
 /**
  * @brief Get the value of the left encoder
@@ -27,10 +27,10 @@ int app_init(void *imu, void *left_encoder, void *right_encoder);
 double app_get_left_encoder_value(void);
 
 /**
- * @brief Get the value of the right encoder
- * @return The current value of the right encoder in radians
+ * @brief Get the value of the left encoder angular velocity
+ * @return The angular velocity of the left encoder in radians/second
  */
-double app_get_right_encoder_value(void);
+double app_get_left_encoder_velocity(void);
 
 #ifdef __cplusplus
 }

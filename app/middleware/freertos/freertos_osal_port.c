@@ -13,6 +13,11 @@
 #include "queue.h"
 #include "task.h"
 
+void osal_delay(uint32_t delay_ms) {
+    TickType_t ticks = pdMS_TO_TICKS(delay_ms);
+    vTaskDelay(ticks);
+}
+
 void *osal_task_static_create(void (*task_function)(void *), void *task_args,
                               void *task_attributes) {
     freertos_osal_task_static_attr_t *task_attr =

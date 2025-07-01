@@ -48,6 +48,7 @@ app/src/app.c \
 app/src/app_config.c \
 app/src/imu.c \
 app/src/encoder.c \
+app/src/actuator.c \
 app/platform/stm32f4/stm32f4_encoder_port.c \
 app/middleware/freertos/freertos_osal_port.c \
 app/middleware/microros/microros_transport.c \

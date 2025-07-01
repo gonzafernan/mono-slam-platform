@@ -25,11 +25,16 @@ extern "C" {
 #define ENCODER_TICKS_PER_REVOLUTION 13  /// Encoder ticks per revolution
 #define ENCODER_TICKS_MULTIPLIER 4  /// Multiplier for encoder ticks (rise/fall)
 
+#define ACTUATOR_TASK_STACK_SIZE 512  /// Stack size for the actuator task
+
 /// @brief IMU task attributes
 extern freertos_osal_task_static_attr_t imu_task_attr;
 
 /// @brief IMU queue attributes
 extern freertos_osal_queue_static_attr_t imu_queue_attr;
+
+/// @brief Actuator task attributes
+extern freertos_osal_task_static_attr_t actuator1_task_attr;
 
 #ifdef __cplusplus
 }
