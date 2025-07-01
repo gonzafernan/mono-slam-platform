@@ -17,13 +17,13 @@ static struct {
 int app_init(void *imu, void *port_encoder1, void *port_encoder2) {
     robot_platform.imu = imu;
     robot_platform.encoder1.context = port_encoder1;
-    robot_platform.encoder1.gear_ratio = MOTOR_GEAR_RATIO *
-                                         ENCODER_TICKS_MULTIPLIER *
-                                         ENCODER_TICKS_PER_REVOLUTION;
+    robot_platform.encoder1.counts_per_revolution =
+        MOTOR_GEAR_RATIO * ENCODER_TICKS_MULTIPLIER *
+        ENCODER_TICKS_PER_REVOLUTION;
     robot_platform.encoder2.context = port_encoder2;
-    robot_platform.encoder2.gear_ratio = MOTOR_GEAR_RATIO *
-                                         ENCODER_TICKS_MULTIPLIER *
-                                         ENCODER_TICKS_PER_REVOLUTION;
+    robot_platform.encoder2.counts_per_revolution =
+        MOTOR_GEAR_RATIO * ENCODER_TICKS_MULTIPLIER *
+        ENCODER_TICKS_PER_REVOLUTION;
 
     if (imu_init(robot_platform.imu, IMU_I2C_ADDRESS, IMU_I2C_TIMEOUT,
                  &imu_task_attr) < 0) {

@@ -10,9 +10,13 @@
 extern "C" {
 #endif
 
+#include <stdint.h>
+
 typedef struct {
     void *context;
-    double gear_ratio;  // Gear ratio to output shaft
+    double counts_per_revolution;  // Counts per revolution
+    uint16_t last_sample;          // Last sampled value
+    int64_t accumulated_ticks;     // Accumulated ticks for position calculation
 } encoder_t;
 
 /**
