@@ -17,6 +17,9 @@ typedef struct {
     double counts_per_revolution;  // Counts per revolution
     uint16_t last_sample;          // Last sampled value
     int64_t accumulated_ticks;     // Accumulated ticks for position calculation
+    uint32_t last_timestamp;       // Last timestamp for velocity calculation
+    double last_angular_position;  // Last angular position in radians
+    double last_angular_velocity;  // Angular velocity in radians per second
 } encoder_t;
 
 /**
@@ -26,19 +29,44 @@ typedef struct {
  * It should be called before any other encoder functions are used.
  *
  * @param encoder Pointer to the encoder structure.
+ * @param context Pointer to the encoder hardware context.
+ * @param counts_per_revolution Number of counts per revolution for the encoder.
+ * @param timestamp Initial timestamp for the encoder in miliseconds.
  * @return 0 on success, -1 on failure.
  */
-int encoder_init(encoder_t *encoder);
+int encoder_init(encoder_t *encoder, void *context,
+                 double counts_per_revolution, uint32_t timestamp);
 
 /**
- * @brief Samples the current encoder position.
+ * @brief Samples the encoder and updates its angular position and velocity.
  *
- * This function reads the current position of the encoder and returns it.
+ * This function reads the current encoder value, calculates the angular
+ * position and velocity, and updates the encoder structure accordingly.
  *
  * @param encoder Pointer to the encoder structure.
- * @return The current encoder position in radians as a double.
+ * @param timestamp Current timestamp for the encoder in miliseconds.
  */
-double encoder_sample_position(encoder_t *encoder);
+void encoder_sample(encoder_t *encoder, uint32_t timestamp);
+
+/**
+ * @brief Gets the last angular position of the encoder.
+ *
+ * This function retrieves the last calculated angular position of the encoder.
+ *
+ * @param encoder Pointer to the encoder structure.
+ * @return The last angular position in radians.
+ */
+double encoder_get_angular_position(encoder_t *encoder);
+
+/**
+ * @brief Gets the last angular velocity of the encoder.
+ *
+ * This function retrieves the last calculated angular velocity of the encoder.
+ *
+ * @param encoder Pointer to the encoder structure.
+ * @return The last angular velocity in radians per second.
+ */
+double encoder_get_angular_velocity(encoder_t *encoder);
 
 #ifdef __cplusplus
 }

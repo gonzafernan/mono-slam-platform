@@ -19,6 +19,12 @@ extern "C" {
 #define OSAL_MAX_DELAY 0xFFFFFFFFUL  /// Maximum delay value for blocking calls
 
 /**
+ * @brief Delay execution for a specified number of milliseconds.
+ * @param delay_ms Number of milliseconds to delay.
+ */
+void osal_delay(uint32_t delay_ms);
+
+/**
  * @brief Create a task with static allocation.
  * @param task_function Pointer to the task function.
  * @param task_args Pointer to the arguments for the task function.
