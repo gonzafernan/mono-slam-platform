@@ -23,18 +23,18 @@ void transport_imu_init(void *context);
 void transport_imu_publish(void);
 
 /**
- * @brief Initialize the transport encoder.
- * This function initializes the transport layer for encoder data.
+ * @brief Initialize the transport layer for joint state data.
+ * This function initializes the transport layer for joint state data.
  * @param context Pointer to the transport context
  */
-void transport_encoder_init(void *context);
+void transport_joint_state_init(void *context);
 
 /**
- * @brief Publish encoder data through the transport layer.
- * This function is called to publish the encoder data through the transport
+ * @brief Publish joint state data through the transport layer.
+ * This function is called to publish the joint state data through the transport
  * layer.
  */
-void transport_encoder_publish(void);
+void transport_joint_state_publish(void);
 
 #ifdef __cplusplus
 }

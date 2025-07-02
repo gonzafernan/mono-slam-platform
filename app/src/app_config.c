@@ -29,7 +29,6 @@ freertos_osal_queue_static_attr_t imu_queue_attr = {
 };
 
 // actuator task
-/// Buffer for the actuator task stack
 uint32_t actuator1_stack_buffer[ACTUATOR_TASK_STACK_SIZE];
 StaticTask_t actuator1_task_buffer;
 
@@ -40,4 +39,16 @@ freertos_osal_task_static_attr_t actuator1_task_attr = {
     .priority = osPriorityNormal,      /// Priority of the actuator task
     .stack = actuator1_stack_buffer,   /// Pointer to the stack
     .cb_mem = &actuator1_task_buffer,  /// Pointer to the control block memory
+};
+
+uint32_t actuator2_stack_buffer[ACTUATOR_TASK_STACK_SIZE];
+StaticTask_t actuator2_task_buffer;
+
+freertos_osal_task_static_attr_t actuator2_task_attr = {
+    .name = "actuator2_task",  /// Name of the actuator task
+    .stack_size =
+        ACTUATOR_TASK_STACK_SIZE,      /// Stack size for the actuator task
+    .priority = osPriorityNormal,      /// Priority of the actuator task
+    .stack = actuator2_stack_buffer,   /// Pointer to the stack
+    .cb_mem = &actuator2_task_buffer,  /// Pointer to the control block memory
 };

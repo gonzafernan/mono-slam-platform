@@ -20,8 +20,8 @@ typedef struct {
 /**
  * @brief Initializes the actuator module.
  *
- * This function initializes the actuator hardware and prepares it for operation.
- * It should be called before any other actuator functions are used.
+ * This function initializes the actuator hardware and prepares it for
+ * operation. It should be called before any other actuator functions are used.
  *
  * @param actuator Pointer to the actuator structure.
  * @param task_attributes Pointer to the task attributes for the actuator task.
@@ -31,6 +31,18 @@ typedef struct {
  */
 int actuator_init(actuator_t *actuator, void *task_attributes,
                   void *port_encoder, double counts_per_revolution);
+
+/**
+ * @brief Get actuator last state.
+ * This function retrieves the last recorded state of the actuator,
+ * including the angular position and angular velocity.
+ * @param actuator Pointer to the actuator structure.
+ * @param angular_position Pointer to store the angular position in radians.
+ * @param angular_velocity Pointer to store the angular velocity in radians per
+ * second.
+ */
+void actuator_get_state(actuator_t *actuator, double *angular_position,
+                        double *angular_velocity);
 
 #ifdef __cplusplus
 }
