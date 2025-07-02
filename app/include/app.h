@@ -11,6 +11,13 @@
 extern "C" {
 #endif
 
+#include "app_config.h"
+
+typedef struct {
+    double angular_position[ACTUATED_JOINTS_NUMBER];
+    double angular_velocity[ACTUATED_JOINTS_NUMBER];
+} joint_state_t;
+
 /**
  * @brief Application initialization
  * @param imu Pointer to the IMU context
@@ -21,16 +28,10 @@ extern "C" {
 int app_init(void *imu, void *port_encoder1, void *port_encoder2);
 
 /**
- * @brief Get the value of the left encoder
- * @return The current value of the left encoder in radians
+ * @brief Get the current joint state
+ * @param joint_state Pointer to a joint_state_t structure to store the state
  */
-double app_get_left_encoder_value(void);
-
-/**
- * @brief Get the value of the left encoder angular velocity
- * @return The angular velocity of the left encoder in radians/second
- */
-double app_get_left_encoder_velocity(void);
+void app_get_joint_state(joint_state_t *joint_state);
 
 #ifdef __cplusplus
 }

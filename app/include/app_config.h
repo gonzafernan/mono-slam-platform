@@ -17,6 +17,9 @@ extern "C" {
 #include "freertos_osal_port_config.h"
 #include "icm20948_driver.h"
 
+#define ACTUATED_JOINTS_NUMBER 2  /// Number of joints in the robot platform
+#define MAX_JOINT_NAME_LENGTH 32  /// Maximum length of joint names
+
 #define IMU_I2C_ADDRESS ICM20948_I2C_ADDRESS1  /// I2C address for the IMU
 #define IMU_I2C_TIMEOUT 1000                   /// Timeout for I2C operations
 #define IMU_TASK_STACK_SIZE 512                /// Stack size for the IMU task9
@@ -33,8 +36,11 @@ extern freertos_osal_task_static_attr_t imu_task_attr;
 /// @brief IMU queue attributes
 extern freertos_osal_queue_static_attr_t imu_queue_attr;
 
-/// @brief Actuator task attributes
+/// @brief Actuator 1 task attributes
 extern freertos_osal_task_static_attr_t actuator1_task_attr;
+
+/// @brief Actuator 2 task attributes
+extern freertos_osal_task_static_attr_t actuator2_task_attr;
 
 #ifdef __cplusplus
 }

@@ -8,9 +8,10 @@
 #include <rcl/rcl.h>
 #include <rclc/rclc.h>
 #include <sensor_msgs/msg/imu.h>
-#include <std_msgs/msg/float32.h>
+#include <sensor_msgs/msg/joint_state.h>
 
 #include "app.h"
+#include "app_config.h"
 #include "imu.h"
 #include "microros_transport_config.h"
 #include "osal_port.h"
@@ -18,11 +19,12 @@
 rcl_publisher_t imu_publisher;
 sensor_msgs__msg__Imu imu_msg;
 
-rcl_publisher_t encoder1_publisher;
-std_msgs__msg__Float32 encoder1_msg;
-
-rcl_publisher_t encoder2_publisher;
-std_msgs__msg__Float32 encoder2_msg;
+rcl_publisher_t joint_state_publisher;
+sensor_msgs__msg__JointState joint_state_msg;
+char name_buffer[ACTUATED_JOINTS_NUMBER][MAX_JOINT_NAME_LENGTH];
+rosidl_runtime_c__String name_array[ACTUATED_JOINTS_NUMBER];
+double position_array[ACTUATED_JOINTS_NUMBER];
+double velocity_array[ACTUATED_JOINTS_NUMBER];
 
 void transport_imu_init(void *context) {
     transport_context_t *transport_context = (transport_context_t *)context;
@@ -97,33 +99,56 @@ void transport_imu_publish(void) {
     }
 }
 
-void transport_encoder_init(void *context) {
+void transport_joint_state_init(void *context) {
     transport_context_t *transport_context = (transport_context_t *)context;
 
     // publisher initialization
     rclc_publisher_init_default(
-        &encoder1_publisher, transport_context->node,
-        ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, Float32),
-        "encoder1_position");
-    encoder1_msg.data = 0;
+        &joint_state_publisher, transport_context->node,
+        ROSIDL_GET_MSG_TYPE_SUPPORT(sensor_msgs, msg, JointState),
+        "joint_state");
 
-    rclc_publisher_init_default(
-        &encoder2_publisher, transport_context->node,
-        ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, Float32),
-        "encoder2_position");
-    encoder2_msg.data = 0;
-}
+    // message initialization
+    sensor_msgs__msg__JointState__init(&joint_state_msg);
+    joint_state_msg.name.data = name_array;
+    joint_state_msg.name.size = ACTUATED_JOINTS_NUMBER;
+    joint_state_msg.name.capacity = ACTUATED_JOINTS_NUMBER;
 
-void transport_encoder_publish(void) {
-    encoder1_msg.data = (float)app_get_left_encoder_value();
-    encoder2_msg.data = (float)app_get_right_encoder_value();
-
-    rcl_ret_t ret = rcl_publish(&encoder1_publisher, &encoder1_msg, NULL);
-    if (ret != RCL_RET_OK) {
-        printf("Error publishing (line %d)\n", __LINE__);
+    for (int i = 0; i < ACTUATED_JOINTS_NUMBER; i++) {
+        name_array[i].data = name_buffer[i];
+        name_array[i].size = 0;  // No names provided
+        name_array[i].capacity = MAX_JOINT_NAME_LENGTH;
     }
 
-    ret = rcl_publish(&encoder2_publisher, &encoder2_msg, NULL);
+    joint_state_msg.position.data = position_array;
+    joint_state_msg.position.size = ACTUATED_JOINTS_NUMBER;
+    joint_state_msg.position.capacity = ACTUATED_JOINTS_NUMBER;
+
+    joint_state_msg.velocity.data = velocity_array;
+    joint_state_msg.velocity.size = ACTUATED_JOINTS_NUMBER;
+    joint_state_msg.velocity.capacity = ACTUATED_JOINTS_NUMBER;
+
+    joint_state_msg.effort.data = NULL;
+    joint_state_msg.effort.size = 0;
+    joint_state_msg.effort.capacity = 0;
+
+    snprintf(name_buffer[0], MAX_JOINT_NAME_LENGTH, "left_wheel");
+    name_array[0].size = strlen(name_buffer[0]);
+
+    snprintf(name_buffer[1], MAX_JOINT_NAME_LENGTH, "right_wheel");
+    name_array[1].size = strlen(name_buffer[1]);
+}
+
+void transport_joint_state_publish(void) {
+    joint_state_t joint_state;
+    app_get_joint_state(&joint_state);
+
+    joint_state_msg.position.data[0] = joint_state.angular_position[0];
+    joint_state_msg.position.data[1] = joint_state.angular_position[1];
+    joint_state_msg.velocity.data[0] = joint_state.angular_velocity[0];
+    joint_state_msg.velocity.data[1] = joint_state.angular_velocity[1];
+
+    rcl_ret_t ret = rcl_publish(&joint_state_publisher, &joint_state_msg, NULL);
     if (ret != RCL_RET_OK) {
         printf("Error publishing (line %d)\n", __LINE__);
     }

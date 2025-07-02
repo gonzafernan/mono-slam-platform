@@ -27,3 +27,9 @@ static void actuator_task(void *argument) {
         encoder_sample(&actuator->encoder, timestamp);
     }
 }
+
+void actuator_get_state(actuator_t *actuator, double *angular_position,
+                         double *angular_velocity) {
+    *angular_position = encoder_get_angular_position(&actuator->encoder);
+    *angular_velocity = encoder_get_angular_velocity(&actuator->encoder);
+}
