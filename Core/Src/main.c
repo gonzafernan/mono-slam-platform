@@ -105,6 +105,7 @@ int main(void)
   MX_I2C1_Init();
   MX_TIM3_Init();
   MX_TIM4_Init();
+  MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
   if (app_init(&hi2c1, &port_encoder1, &port_encoder2) < 0) {
     Error_Handler();
