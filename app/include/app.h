@@ -12,6 +12,7 @@ extern "C" {
 #endif
 
 #include "app_config.h"
+#include "actuator.h"
 
 typedef struct {
     double angular_position[ACTUATED_JOINTS_NUMBER];
@@ -21,11 +22,12 @@ typedef struct {
 /**
  * @brief Application initialization
  * @param imu Pointer to the IMU context
- * @param port_encoder1 Pointer to the encoder 1 context
- * @param port_encoder2 Pointer to the encoder 2 context
+ * @param actuator1_args Pointer to the actuator 1 arguments
+ * @param actuator2_args Pointer to the actuator 2 arguments
  * @return 0 on success, -1 on failure
  */
-int app_init(void *imu, void *port_encoder1, void *port_encoder2);
+int app_init(void *imu, actuator_args_t *actuator1_args,
+             actuator_args_t *actuator2_args);
 
 /**
  * @brief Get the current joint state

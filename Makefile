@@ -54,6 +54,9 @@ app/middleware/freertos/freertos_osal_port.c \
 app/middleware/microros/microros_transport.c \
 lib/device_drivers/src/icm20948_driver.c \
 lib/device_drivers/src/ak09916_driver.c \
+lib/device_drivers/src/hbridge_driver.c \
+lib/device_drivers/platform/stm32f4/stm32f4_gpio_port.c \
+lib/device_drivers/platform/stm32f4/stm32f4_pwm_port.c \
 lib/device_drivers/platform/stm32f4/stm32f4_i2c_port.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim_ex.c \
@@ -160,6 +163,7 @@ C_INCLUDES =  \
 -Iapp/middleware/freertos \
 -Iapp/middleware/microros \
 -Ilib/device_drivers/include \
+-Ilib/device_drivers/platform/stm32f4 \
 -IDrivers/CMSIS/Include
 
 

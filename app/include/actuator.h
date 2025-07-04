@@ -11,11 +11,21 @@ extern "C" {
 #endif
 
 #include "encoder.h"
+#include "hbridge_driver.h"
 
 typedef struct {
     void *task_handle;
     encoder_t encoder;  // Pointer to the first encoder
+    hbridge_t hbridge;  // Pointer to the H-bridge driver
 } actuator_t;
+
+typedef struct {
+    void *port_encoder;            // Pointer to the encoder port context
+    double counts_per_revolution;  // Number of counts per revolution
+    void *port_hbridge_pwm;        // Pointer to the H-bridge PWM port context
+    void *port_hbridge_in1;        // Pointer to the H-bridge IN1 port context
+    void *port_hbridge_in2;        // Pointer to the H-bridge IN2 port context
+} actuator_args_t;
 
 /**
  * @brief Initializes the actuator module.
@@ -25,12 +35,11 @@ typedef struct {
  *
  * @param actuator Pointer to the actuator structure.
  * @param task_attributes Pointer to the task attributes for the actuator task.
- * @param port_encoder Pointer to the encoder port context.
- * @param counts_per_revolution Number of counts per revolution for the encoder.
+ * @param args Pointer to the actuator arguments containing port contexts and
  * @return 0 on success, -1 on failure.
  */
 int actuator_init(actuator_t *actuator, void *task_attributes,
-                  void *port_encoder, double counts_per_revolution);
+                  actuator_args_t *args);
 
 /**
  * @brief Get actuator last state.
