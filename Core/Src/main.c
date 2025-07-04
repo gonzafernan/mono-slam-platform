@@ -28,6 +28,10 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "app.h"
+#include "app_config.h"
+#include "actuator.h"
+#include "stm32f4_gpio_port_config.h"
+#include "stm32f4_pwm_port_config.h"
 #include "stm32f4_encoder_port_config.h"
 /* USER CODE END Includes */
 
@@ -56,6 +60,54 @@ stm32f4_encoder_handle_t port_encoder1 = {
 stm32f4_encoder_handle_t port_encoder2 = {
     .htim = &htim4,
     .channels = TIM_CHANNEL_ALL,
+};
+
+stm32f4_gpio_port_t port_hbridge1_in1 = {
+    .port = GPIOB,
+    .pin = GPIO_PIN_14,
+};
+
+stm32f4_gpio_port_t port_hbridge1_in2 = {
+    .port = GPIOB,
+    .pin = GPIO_PIN_15,
+};
+
+stm32f4_gpio_port_t port_hbridge2_in1 = {
+    .port = GPIOB,
+    .pin = GPIO_PIN_13,
+};
+
+stm32f4_gpio_port_t port_hbridge2_in2 = {
+    .port = GPIOB,
+    .pin = GPIO_PIN_12,
+};
+
+stm32f4_pwm_port_t port_hbridge1_pwm = {
+    .htim = &htim2,
+    .channel = TIM_CHANNEL_2,
+};
+
+stm32f4_pwm_port_t port_hbridge2_pwm = {
+    .htim = &htim2,
+    .channel = TIM_CHANNEL_1,
+};
+
+actuator_args_t actuator1_args = {
+    .port_encoder = (void *)&port_encoder1,
+    .counts_per_revolution = MOTOR_GEAR_RATIO * ENCODER_TICKS_MULTIPLIER *
+                             ENCODER_TICKS_PER_REVOLUTION,
+    .port_hbridge_pwm = (void *)&port_hbridge1_pwm,
+    .port_hbridge_in1 = (void *)&port_hbridge1_in1,
+    .port_hbridge_in2 = (void *)&port_hbridge1_in2,
+};
+
+actuator_args_t actuator2_args = {
+    .port_encoder = (void *)&port_encoder2,
+    .counts_per_revolution = MOTOR_GEAR_RATIO * ENCODER_TICKS_MULTIPLIER *
+                             ENCODER_TICKS_PER_REVOLUTION,
+    .port_hbridge_pwm = (void *)&port_hbridge2_pwm,
+    .port_hbridge_in1 = (void *)&port_hbridge2_in1,
+    .port_hbridge_in2 = (void *)&port_hbridge2_in2,
 };
 /* USER CODE END PV */
 
@@ -107,7 +159,7 @@ int main(void)
   MX_TIM4_Init();
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
-  if (app_init(&hi2c1, &port_encoder1, &port_encoder2) < 0) {
+  if (app_init(&hi2c1, &actuator1_args, &actuator2_args) < 0) {
     Error_Handler();
   }
   /* USER CODE END 2 */

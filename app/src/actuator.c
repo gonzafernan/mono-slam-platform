@@ -10,11 +10,18 @@
 static void actuator_task(void *argument);
 
 int actuator_init(actuator_t *actuator, void *task_attributes,
-                  void *port_encoder, double counts_per_revolution) {
+                  actuator_args_t *args) {
     actuator->task_handle = osal_task_static_create(
         actuator_task, (void *)actuator, task_attributes);
-    return encoder_init(&actuator->encoder, port_encoder, counts_per_revolution,
-                        0);
+    if (encoder_init(&actuator->encoder, args->port_encoder,
+                     args->counts_per_revolution, 0) < 0) {
+        return -1;
+    }
+    if (hbridge_init(&actuator->hbridge, args->port_hbridge_pwm,
+                     args->port_hbridge_in1, args->port_hbridge_in2) < 0) {
+        return -1;
+    }
+    return 0;
 }
 
 static void actuator_task(void *argument) {
@@ -29,7 +36,7 @@ static void actuator_task(void *argument) {
 }
 
 void actuator_get_state(actuator_t *actuator, double *angular_position,
-                         double *angular_velocity) {
+                        double *angular_velocity) {
     *angular_position = encoder_get_angular_position(&actuator->encoder);
     *angular_velocity = encoder_get_angular_velocity(&actuator->encoder);
 }

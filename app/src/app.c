@@ -5,7 +5,6 @@
  */
 
 #include "app.h"
-#include "actuator.h"
 #include "app_config.h"
 #include "imu.h"
 
@@ -15,21 +14,20 @@ static struct {
     actuator_t actuator2;
 } robot_platform;
 
-int app_init(void *imu, void *port_encoder1, void *port_encoder2) {
+int app_init(void *imu, actuator_args_t *actuator1_args,
+             actuator_args_t *actuator2_args) {
     robot_platform.imu = imu;
-    double counts_per_revolution = MOTOR_GEAR_RATIO * ENCODER_TICKS_MULTIPLIER *
-                                   ENCODER_TICKS_PER_REVOLUTION;
 
     if (imu_init(robot_platform.imu, IMU_I2C_ADDRESS, IMU_I2C_TIMEOUT,
                  &imu_task_attr) < 0) {
         return -1;
     }
     if (actuator_init(&robot_platform.actuator1, &actuator1_task_attr,
-                      port_encoder1, counts_per_revolution) < 0) {
+                      actuator1_args) < 0) {
         return -1;
     }
     if (actuator_init(&robot_platform.actuator2, &actuator2_task_attr,
-                      port_encoder2, counts_per_revolution) < 0) {
+                      actuator2_args) < 0) {
         return -1;
     }
     return 0;
