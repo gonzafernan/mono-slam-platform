@@ -28,6 +28,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "app.h"
+#include "debug.h"
 #include "app_config.h"
 #include "actuator.h"
 #include "stm32f4_gpio_port_config.h"
@@ -160,6 +161,7 @@ int main(void)
   MX_TIM2_Init();
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
+  debug_init(&huart2);
   if (app_init(&hi2c1, &actuator1_args, &actuator2_args) < 0) {
     Error_Handler();
   }

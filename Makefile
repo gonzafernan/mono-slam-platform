@@ -50,6 +50,7 @@ app/src/imu.c \
 app/src/encoder.c \
 app/src/actuator.c \
 app/platform/stm32f4/stm32f4_encoder_port.c \
+app/platform/stm32f4/stm32f4_debug.c \
 app/middleware/freertos/freertos_osal_port.c \
 app/middleware/microros/microros_transport.c \
 lib/device_drivers/src/icm20948_driver.c \
