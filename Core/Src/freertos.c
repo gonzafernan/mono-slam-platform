@@ -37,7 +37,9 @@
 #include <rclc/rclc.h>
 #include <rmw_microros/rmw_microros.h>
 #include <rmw_microxrcedds_c/config.h>
+#include <rclc_parameter/rclc_parameter.h>
 #include <uxr/client/transport.h>
+#include <stdio.h>
 
 
 #include <geometry_msgs/msg/quaternion.h>
@@ -64,6 +66,7 @@ typedef StaticTask_t osStaticThreadDef_t;
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN Variables */
 static transport_context_t transport_context;
+static rcl_timer_t publisher_timer;
 /* USER CODE END Variables */
 /* Definitions for defaultTask */
 osThreadId_t defaultTaskHandle;
@@ -92,6 +95,7 @@ void microros_deallocate(void* pointer, void* state);
 void* microros_reallocate(void* pointer, size_t size, void* state);
 void* microros_zero_allocate(size_t number_of_elements, size_t size_of_element,
                              void* state);
+void publisher_timer_callback(rcl_timer_t *timer, int64_t last_call_time);
 /* USER CODE END FunctionPrototypes */
 
 void StartDefaultTask(void *argument);
@@ -168,6 +172,7 @@ void StartDefaultTask(void *argument)
     rclc_support_t support;
     rcl_allocator_t allocator;
     rcl_node_t node;
+    rclc_executor_t executor;
 
     allocator = rcl_get_default_allocator();
 
@@ -177,16 +182,27 @@ void StartDefaultTask(void *argument)
     // create node
     rclc_node_init_default(&node, "cubemx_node", "", &support);
 
+    // executor
+    executor = rclc_executor_get_zero_initialized_executor();
+    rclc_executor_init(&executor, &support.context,
+                       RCLC_EXECUTOR_PARAMETER_SERVER_HANDLES + 5, &allocator);
+    unsigned int rcl_executor_timeout = 10;
+    rclc_executor_set_timeout(&executor, RCL_MS_TO_NS(rcl_executor_timeout));
+
+    unsigned int rcl_timer_timeout = 100;
+    rclc_timer_init_default(&publisher_timer, &support, RCL_MS_TO_NS(rcl_timer_timeout),
+                            publisher_timer_callback);
+    rclc_executor_add_timer(&executor, &publisher_timer);
+
     // create app transport layer
     transport_context.node = &node;
+    transport_context.executor = &executor;
     transport_imu_init((void *)&transport_context);
     transport_joint_state_init((void *)&transport_context);
+    transport_parameter_server_init((void *)&transport_context);
 
-    for (;;) {
-        osDelay(100);
-        transport_imu_publish();
-        transport_joint_state_publish();
-    }
+    rclc_executor_prepare(&executor);
+    rclc_executor_spin(&executor);
   /* USER CODE END StartDefaultTask */
 }
 
@@ -195,6 +211,16 @@ void StartDefaultTask(void *argument)
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
     if (GPIO_Pin == GPIO_PIN_12) {
         imu_task_notify_from_isr();
+    }
+}
+
+void publisher_timer_callback(rcl_timer_t *timer, int64_t last_call_time) {
+    if (timer != NULL) {
+        transport_imu_publish();
+        transport_joint_state_publish();
+    } else {
+        printf("Error timer callback execution without handle (line %d)\r\n",
+               __LINE__);
     }
 }
 

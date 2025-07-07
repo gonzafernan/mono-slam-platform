@@ -7,14 +7,18 @@
 
 #include <rcl/rcl.h>
 #include <rclc/rclc.h>
+#include <rclc_parameter/rclc_parameter.h>
 #include <sensor_msgs/msg/imu.h>
 #include <sensor_msgs/msg/joint_state.h>
+#include <stdio.h>
 
 #include "app.h"
 #include "app_config.h"
 #include "imu.h"
 #include "microros_transport_config.h"
 #include "osal_port.h"
+
+rclc_parameter_server_t parameter_server;
 
 rcl_publisher_t imu_publisher;
 sensor_msgs__msg__Imu imu_msg;
@@ -151,5 +155,28 @@ void transport_joint_state_publish(void) {
     rcl_ret_t ret = rcl_publish(&joint_state_publisher, &joint_state_msg, NULL);
     if (ret != RCL_RET_OK) {
         printf("Error publishing (line %d)\n", __LINE__);
+    }
+}
+
+bool transport_on_parameter_modification_callback(const Parameter *old_param,
+                                                  const Parameter *new_param,
+                                                  void *context) {
+    printf("Parameter changed\r\n");
+    return true;
+}
+
+void transport_parameter_server_init(void *context) {
+    transport_context_t *transport_context = (transport_context_t *)context;
+    rcl_ret_t ret = rclc_parameter_server_init_default(&parameter_server,
+                                                       transport_context->node);
+    if (ret != RCL_RET_OK) {
+        printf("Error on parameter server init (line %d)\r\n", __LINE__);
+    }
+    ret = rclc_executor_add_parameter_server(
+        transport_context->executor, &parameter_server,
+        transport_on_parameter_modification_callback);
+    if (ret != RCL_RET_OK) {
+        printf("Error adding parameter server to executor (line %d)\r\n",
+               __LINE__);
     }
 }
