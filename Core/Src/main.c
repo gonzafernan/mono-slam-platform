@@ -65,22 +65,22 @@ stm32f4_encoder_handle_t port_encoder2 = {
 
 stm32f4_gpio_port_t port_hbridge1_in1 = {
     .port = GPIOB,
-    .pin = GPIO_PIN_14,
+    .pin = GPIO_PIN_12,
 };
 
 stm32f4_gpio_port_t port_hbridge1_in2 = {
     .port = GPIOB,
-    .pin = GPIO_PIN_15,
+    .pin = GPIO_PIN_13,
 };
 
 stm32f4_gpio_port_t port_hbridge2_in1 = {
     .port = GPIOB,
-    .pin = GPIO_PIN_13,
+    .pin = GPIO_PIN_14,
 };
 
 stm32f4_gpio_port_t port_hbridge2_in2 = {
     .port = GPIOB,
-    .pin = GPIO_PIN_12,
+    .pin = GPIO_PIN_15,
 };
 
 stm32f4_pwm_port_t port_hbridge1_pwm = {
