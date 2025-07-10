@@ -18,6 +18,14 @@ void osal_delay(uint32_t delay_ms) {
     vTaskDelay(ticks);
 }
 
+void osal_delay_until(uint32_t *last_exec_time, uint32_t delay_ms) {
+    vTaskDelayUntil((TickType_t *)last_exec_time, pdMS_TO_TICKS(delay_ms));
+}
+
+uint32_t osal_get_time_ms(void) {
+    return xTaskGetTickCount() * portTICK_PERIOD_MS;
+}
+
 void *osal_task_static_create(void (*task_function)(void *), void *task_args,
                               void *task_attributes) {
     freertos_osal_task_static_attr_t *task_attr =

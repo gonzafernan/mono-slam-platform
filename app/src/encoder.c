@@ -7,8 +7,8 @@
 #include <math.h>
 #include "encoder_port.h"
 
-int encoder_init(encoder_t *encoder, void *context,
-                 double counts_per_revolution, uint32_t timestamp) {
+int encoder_init(encoder_t *encoder, void *context, float counts_per_revolution,
+                 uint32_t timestamp) {
     if (encoder_port_init(context) < 0) {
         return -1;
     }
@@ -19,17 +19,19 @@ int encoder_init(encoder_t *encoder, void *context,
     encoder->last_timestamp = timestamp;
     encoder->last_angular_position = 0.0;
     encoder->last_angular_velocity = 0.0;
+    sliding_mode1_diff_init(&encoder->diff_filter, 5.0f, 10.0f);
     return 0;
 }
 
 void encoder_sample(encoder_t *encoder, uint32_t timestamp) {
     uint16_t raw_value = encoder_port_sample(encoder->context);
-    int16_t delta_ticks = (int16_t)(raw_value - encoder->last_sample);
+    int16_t delta_ticks =
+        (int16_t)((int32_t)raw_value - (int32_t)encoder->last_sample);
     encoder->accumulated_ticks += delta_ticks;
     encoder->last_sample = raw_value;
 
-    double angular_position = (double)encoder->accumulated_ticks * M_TWOPI /
-                              encoder->counts_per_revolution;
+    float angular_position = (float)encoder->accumulated_ticks * M_TWOPI /
+                             encoder->counts_per_revolution;
 
     uint32_t delta_timestamp = timestamp - encoder->last_timestamp;
 
@@ -40,16 +42,19 @@ void encoder_sample(encoder_t *encoder, uint32_t timestamp) {
         return;
     }
 
-    encoder->last_angular_velocity =
-        (angular_position - encoder->last_angular_position) /
-        ((double)delta_timestamp / 1000.0);  // Convert ms to seconds
+    sliding_mode1_diff_update(&encoder->diff_filter, angular_position, 0.01);
+
+    // encoder->last_angular_velocity = (angular_position - encoder->last_angular_position) / 0.01;  // Convert ms to seconds
+    // encoder->last_angular_velocity = (float)delta_timestamp / 1000;
     encoder->last_angular_position = angular_position;
+    encoder->last_timestamp = timestamp;
 }
 
-double encoder_get_angular_position(encoder_t *encoder) {
+float encoder_get_angular_position(encoder_t *encoder) {
     return encoder->last_angular_position;
 }
 
-double encoder_get_angular_velocity(encoder_t *encoder) {
-    return encoder->last_angular_velocity;
+float encoder_get_angular_velocity(encoder_t *encoder) {
+    // return encoder->last_angular_velocity;
+    return sliding_model_diff_get_diff(&encoder->diff_filter);
 }

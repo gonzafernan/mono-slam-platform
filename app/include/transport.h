@@ -11,6 +11,12 @@ extern "C" {
 #endif
 
 /**
+ * @brief Initialize the transport layer for velocity command data.
+ * @param context Pointer to the transport context
+ */
+void transport_command_velocity_init(void *context);
+
+/**
  * @brief Initialize the transport layer for IMU data.
  * @param context Pointer to the transport context
  */

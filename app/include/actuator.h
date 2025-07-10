@@ -12,11 +12,16 @@ extern "C" {
 
 #include "encoder.h"
 #include "hbridge_driver.h"
+#include "pid.h"
 
 typedef struct {
     void *task_handle;
-    encoder_t encoder;  // Pointer to the first encoder
-    hbridge_t hbridge;  // Pointer to the H-bridge driver
+    encoder_t encoder;                // Pointer to the first encoder
+    hbridge_t hbridge;                // Pointer to the H-bridge driver
+    int8_t encoder_sign;              // Encoder sign (-1, 1)
+    uint8_t hbridge_dir;              // H-bridge direction (0, 1)
+    pid_controller_t controller;      // Pointer to the actuator controller
+    float angular_velocity_setpoint;  // Current angular velocity setpoint
 } actuator_t;
 
 typedef struct {
@@ -25,6 +30,8 @@ typedef struct {
     void *port_hbridge_pwm;        // Pointer to the H-bridge PWM port context
     void *port_hbridge_in1;        // Pointer to the H-bridge IN1 port context
     void *port_hbridge_in2;        // Pointer to the H-bridge IN2 port context
+    int8_t encoder_sign;           // Encoder sign (-1, 1)
+    uint8_t hbridge_dir;           // H-bridge direction (0, 1)
 } actuator_args_t;
 
 /**
@@ -52,6 +59,27 @@ int actuator_init(actuator_t *actuator, void *task_attributes,
  */
 void actuator_get_state(actuator_t *actuator, double *angular_position,
                         double *angular_velocity);
+
+/**
+ * @brief Update actuator angular velocity setpoint.
+ * @param actuator Pointer to the actuator structure.
+ * @param angular_velocity New angular velocity setpoint.
+ */
+void actuator_update_setpoint(actuator_t *actuator, float angular_velocity);
+
+/**
+ * @brief Update actuator controller proportional gain
+ * @param actuator Pointer to the actuator structure.
+ * @param kp New proportional gain
+ */
+void actuator_set_controller_kp(actuator_t *actuator, float kp);
+
+/**
+ * @brief Update actuator controller integral gain
+ * @param actuator Pointer to the actuator structure.
+ * @param ki New integral gain
+ */
+void actuator_set_controller_ki(actuator_t *actuator, float ki);
 
 #ifdef __cplusplus
 }

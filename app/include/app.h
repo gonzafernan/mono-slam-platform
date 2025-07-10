@@ -11,8 +11,8 @@
 extern "C" {
 #endif
 
-#include "app_config.h"
 #include "actuator.h"
+#include "app_config.h"
 
 typedef struct {
     double angular_position[ACTUATED_JOINTS_NUMBER];
@@ -34,6 +34,27 @@ int app_init(void *imu, actuator_args_t *actuator1_args,
  * @param joint_state Pointer to a joint_state_t structure to store the state
  */
 void app_get_joint_state(joint_state_t *joint_state);
+
+/**
+ * @brief Update platform state setpoint.
+ * @param linear_velocity Platform linear velocity setpoint in milimeters per
+ * second
+ * @param angular_velocity Platform angular velocity setpoint in radians per
+ * second
+ */
+void app_update_setpoint(float linear_velocity, float angular_velocity);
+
+/**
+ * @brief Update actuator controller proportional gain
+ * @param kp New proportional gain
+ */
+void app_update_actuator_kp(float kp);
+
+/**
+ * @brief Update actuator controller integral gain
+ * @param ki New integral gain
+ */
+void app_update_actuator_ki(float ki);
 
 #ifdef __cplusplus
 }
