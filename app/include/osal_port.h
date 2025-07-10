@@ -25,6 +25,19 @@ extern "C" {
 void osal_delay(uint32_t delay_ms);
 
 /**
+ * @brief Daly execution until a specific number of miliseconds.
+ * @param last_exec_time Pointer to the execution time reference.
+ * @param delay_ms Number of miliseconds to delay.
+ */
+void osal_delay_until(uint32_t *last_exec_time, uint32_t delay_ms);
+
+/**
+ * @brief Get the current time in miliseconds (to be called from a task).
+ * @return Current time in miliseconds.
+ */
+uint32_t osal_get_time_ms(void);
+
+/**
  * @brief Create a task with static allocation.
  * @param task_function Pointer to the task function.
  * @param task_args Pointer to the arguments for the task function.

@@ -186,7 +186,7 @@ void StartDefaultTask(void *argument)
     executor = rclc_executor_get_zero_initialized_executor();
     rclc_executor_init(&executor, &support.context,
                        RCLC_EXECUTOR_PARAMETER_SERVER_HANDLES + 5, &allocator);
-    unsigned int rcl_executor_timeout = 10;
+    unsigned int rcl_executor_timeout = 50;
     rclc_executor_set_timeout(&executor, RCL_MS_TO_NS(rcl_executor_timeout));
 
     unsigned int rcl_timer_timeout = 100;
@@ -199,6 +199,7 @@ void StartDefaultTask(void *argument)
     transport_context.executor = &executor;
     transport_imu_init((void *)&transport_context);
     transport_joint_state_init((void *)&transport_context);
+    transport_command_velocity_init((void *)&transport_context);
     transport_parameter_server_init((void *)&transport_context);
 
     rclc_executor_prepare(&executor);

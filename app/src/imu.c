@@ -85,7 +85,6 @@ static void imu_task(void *argument) {
     for (;;) {
         // wait notification from imu (accel/gyro) data ready
         // osal_task_notify_wait(OSAL_MAX_DELAY);
-        HAL_GPIO_TogglePin(USER_LED_GPIO_Port, USER_LED_Pin);
         osDelay(100);
         if (imu_read_accelerometer(&accel_x, &accel_y, &accel_z)) {
             sample.accel_x = 0.0;

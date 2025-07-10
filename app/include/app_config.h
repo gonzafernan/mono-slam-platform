@@ -30,6 +30,16 @@ extern "C" {
 
 #define ACTUATOR_TASK_STACK_SIZE 512  /// Stack size for the actuator task
 
+#define PLATFORM_WIDTH_MM 160  /// Platform width in milimeters
+#define WHEEL_DIAMETER_MM 65   /// Wheel diameters in milimeters
+
+#define LEFT_WHEEL_INDEX 0
+#define LEFT_WHEEL_MOTOR_DIR 0
+#define LEFT_WHEEL_ENCODER_SIGN -1
+
+#define RIGHT_WHEEL_MOTOR_DIR 1
+#define RIGHT_WHEEL_ENCODER_SIGN -1
+
 /// @brief IMU task attributes
 extern freertos_osal_task_static_attr_t imu_task_attr;
 

@@ -5,6 +5,7 @@
  * This file provides the implementation of the transport layer for micro-ROS.
  */
 
+#include <geometry_msgs/msg/twist.h>
 #include <rcl/rcl.h>
 #include <rclc/rclc.h>
 #include <rclc_parameter/rclc_parameter.h>
@@ -29,6 +30,25 @@ char name_buffer[ACTUATED_JOINTS_NUMBER][MAX_JOINT_NAME_LENGTH];
 rosidl_runtime_c__String name_array[ACTUATED_JOINTS_NUMBER];
 double position_array[ACTUATED_JOINTS_NUMBER];
 double velocity_array[ACTUATED_JOINTS_NUMBER];
+
+rcl_subscription_t cmd_vel_subscriber;
+geometry_msgs__msg__Twist cmd_vel_msg;
+
+void cmd_vel_callback(const void *msgin) {
+    const geometry_msgs__msg__Twist *msg =
+        (const geometry_msgs__msg__Twist *)msgin;
+    app_update_setpoint(msg->linear.x, msg->angular.z);
+}
+
+void transport_command_velocity_init(void *context) {
+    transport_context_t *transport_context = (transport_context_t *)context;
+    rclc_subscription_init_default(
+        &cmd_vel_subscriber, transport_context->node,
+        ROSIDL_GET_MSG_TYPE_SUPPORT(geometry_msgs, msg, Twist), "/cmd_vel");
+    rclc_executor_add_subscription(transport_context->executor,
+                                   &cmd_vel_subscriber, &cmd_vel_msg,
+                                   &cmd_vel_callback, ON_NEW_DATA);
+}
 
 void transport_imu_init(void *context) {
     transport_context_t *transport_context = (transport_context_t *)context;
@@ -161,7 +181,26 @@ void transport_joint_state_publish(void) {
 bool transport_on_parameter_modification_callback(const Parameter *old_param,
                                                   const Parameter *new_param,
                                                   void *context) {
-    printf("Parameter changed\r\n");
+    if (old_param == NULL && new_param == NULL) {
+        printf("Callback error, both parameters are NULL\r\n");
+        return false;
+    }
+
+    if (old_param == NULL) {
+        printf("Creat(ing new parameter %s\r\n", new_param->name.data);
+    } else if (new_param == NULL) {
+        printf("Deleting parameter %s\r\n", old_param->name.data);
+    } else {
+        printf("Parameter %s modified.", old_param->name.data);
+        if (strcmp(new_param->name.data, "controller/kp") == 0) {
+            printf("Updated controller kp: %.4f", new_param->value.double_value);
+            app_update_actuator_kp((float)new_param->value.double_value);
+        }
+        if (strcmp(new_param->name.data, "controller/ki") == 0) {
+            printf("Updated controller ki: %.4f", new_param->value.double_value);
+            app_update_actuator_ki((float)new_param->value.double_value);
+        }
+    }
     return true;
 }
 
@@ -177,6 +216,30 @@ void transport_parameter_server_init(void *context) {
         transport_on_parameter_modification_callback);
     if (ret != RCL_RET_OK) {
         printf("Error adding parameter server to executor (line %d)\r\n",
+               __LINE__);
+    }
+
+    ret = rclc_add_parameter(&parameter_server, "controller/kp",
+                             RCLC_PARAMETER_DOUBLE);
+    if (ret != RCL_RET_OK) {
+        printf("Error adding parameter kp to server (line %d)\r\n", __LINE__);
+    }
+    ret = rclc_add_parameter_description(&parameter_server, "controller/kp",
+                                         "Controller kp gain", "");
+    if (ret != RCL_RET_OK) {
+        printf("Error setting description for parameter kp (line %d)\r\n",
+               __LINE__);
+    }
+
+    ret = rclc_add_parameter(&parameter_server, "controller/ki",
+                             RCLC_PARAMETER_DOUBLE);
+    if (ret != RCL_RET_OK) {
+        printf("Error adding parameter ki to server (line %d)\r\n", __LINE__);
+    }
+    ret = rclc_add_parameter_description(&parameter_server, "controller/ki",
+                                         "Controller ki gain", "");
+    if (ret != RCL_RET_OK) {
+        printf("Error setting description for parameter ki (line %d)\r\n",
                __LINE__);
     }
 }
