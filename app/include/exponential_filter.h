@@ -27,7 +27,7 @@ void exponential_filter_init(exponential_filter_t *self, float alpha);
  * @param self Pointer to the exponential filter instance
  * @param input The new input to the filter
  */
-double exponential_filter_update(exponential_filter_t *self, float input);
+float exponential_filter_update(exponential_filter_t *self, float input);
 
 #ifdef __cplusplus
 }
