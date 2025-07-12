@@ -11,6 +11,7 @@ extern "C" {
 #endif
 
 #include <stdint.h>
+#include "exponential_filter.h"
 #include "sliding_mode_diff.h"
 
 typedef struct {
@@ -19,7 +20,7 @@ typedef struct {
     uint16_t last_sample;         // Last sampled value
     int64_t accumulated_ticks;    // Accumulated ticks for position calculation
     uint32_t last_timestamp;      // Last timestamp for velocity calculation
-    sliding_mode1_diff_t diff_filter;  // Pointer to angular velocity filter
+    exponential_filter_t diff_filter;  // Pointer to angular velocity filter
     float last_angular_position;       // Last angular position in radians
     float last_angular_velocity;       // Angular velocity in radians per second
 } encoder_t;

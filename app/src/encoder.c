@@ -19,7 +19,7 @@ int encoder_init(encoder_t *encoder, void *context, float counts_per_revolution,
     encoder->last_timestamp = timestamp;
     encoder->last_angular_position = 0.0;
     encoder->last_angular_velocity = 0.0;
-    sliding_mode1_diff_init(&encoder->diff_filter, 5.0f, 10.0f);
+    exponential_filter_init(&encoder->diff_filter, 0.1f);
     return 0;
 }
 
@@ -42,10 +42,11 @@ void encoder_sample(encoder_t *encoder, uint32_t timestamp) {
         return;
     }
 
-    sliding_mode1_diff_update(&encoder->diff_filter, angular_position, 0.01);
-
-    // encoder->last_angular_velocity = (angular_position - encoder->last_angular_position) / 0.01;  // Convert ms to seconds
-    // encoder->last_angular_velocity = (float)delta_timestamp / 1000;
+    encoder->last_angular_velocity =
+        (angular_position - encoder->last_angular_position) /
+        0.01;  // Convert ms to seconds
+    encoder->last_angular_velocity = exponential_filter_update(
+        &encoder->diff_filter, encoder->last_angular_velocity);
     encoder->last_angular_position = angular_position;
     encoder->last_timestamp = timestamp;
 }
@@ -55,6 +56,5 @@ float encoder_get_angular_position(encoder_t *encoder) {
 }
 
 float encoder_get_angular_velocity(encoder_t *encoder) {
-    // return encoder->last_angular_velocity;
-    return sliding_model_diff_get_diff(&encoder->diff_filter);
+    return encoder->last_angular_velocity;
 }
