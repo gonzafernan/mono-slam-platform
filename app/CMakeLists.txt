@@ -7,7 +7,12 @@ add_library(pid STATIC
     src/pid.c
 )
 
+add_library(exponential_filter STATIC
+    src/exponential_filter.c
+)
+
 target_include_directories(pid PUBLIC include)
+target_include_directories(exponential_filter PUBLIC include)
 
 # Google Test
 include(FetchContent)
@@ -17,16 +22,18 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(googletest)
 
-add_executable(test_pid
+add_executable(unittest
     test/test_pid.cpp
+    test/test_exponential_filter.cpp
 )
 
-target_link_libraries(test_pid
+target_link_libraries(unittest
     pid
+    exponential_filter
     gtest_main
 )
 
-target_include_directories(test_pid PRIVATE include test)
+target_include_directories(unittest PRIVATE include test)
 
 include(GoogleTest)
-gtest_discover_tests(test_pid)
+gtest_discover_tests(unittest)
