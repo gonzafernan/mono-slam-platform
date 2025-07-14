@@ -49,8 +49,20 @@ extern freertos_osal_queue_static_attr_t imu_queue_attr;
 /// @brief Actuator 1 task attributes
 extern freertos_osal_task_static_attr_t actuator1_task_attr;
 
+/// @brief Actuator 1 state queue attributes
+extern freertos_osal_queue_static_attr_t actuator1_state_queue_attr;
+
+/// @brief Actuator 1 parameters queue attributes
+extern freertos_osal_queue_static_attr_t actuator1_param_queue_attr;
+
 /// @brief Actuator 2 task attributes
 extern freertos_osal_task_static_attr_t actuator2_task_attr;
+
+/// @brief Actuator 2 state queue attributes
+extern freertos_osal_queue_static_attr_t actuator2_state_queue_attr;
+
+/// @brief Actuator 2 parameters queue attributes
+extern freertos_osal_queue_static_attr_t actuator2_param_queue_attr;
 
 #ifdef __cplusplus
 }

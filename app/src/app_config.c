@@ -4,6 +4,7 @@
  */
 
 #include "app_config.h"
+#include "actuator.h"
 #include "imu.h"
 
 // imu task
@@ -51,4 +52,37 @@ freertos_osal_task_static_attr_t actuator2_task_attr = {
     .priority = osPriorityNormal,      /// Priority of the actuator task
     .stack = actuator2_stack_buffer,   /// Pointer to the stack
     .cb_mem = &actuator2_task_buffer,  /// Pointer to the control block memory
+};
+
+// actuator queues
+uint8_t actuator1_state_queue_buffer[sizeof(actuator_state_sample_t)];
+StaticQueue_t actuator1_state_queue_cbm;
+
+freertos_osal_queue_static_attr_t actuator1_state_queue_attr = {
+    .queue_buffer = actuator1_state_queue_buffer,
+    .cb_mem = &actuator1_state_queue_cbm,
+};
+
+uint8_t actuator1_param_queue_buffer[sizeof(actuator_param_t)];
+StaticQueue_t actuator1_param_queue_cbm;
+
+freertos_osal_queue_static_attr_t actuator1_param_queue_attr = {
+    .queue_buffer = actuator1_param_queue_buffer,
+    .cb_mem = &actuator1_param_queue_cbm,
+};
+
+uint8_t actuator2_state_queue_buffer[sizeof(actuator_state_sample_t)];
+StaticQueue_t actuator2_state_queue_cbm;
+
+freertos_osal_queue_static_attr_t actuator2_state_queue_attr = {
+    .queue_buffer = actuator2_state_queue_buffer,
+    .cb_mem = &actuator2_state_queue_cbm,
+};
+
+uint8_t actuator2_param_queue_buffer[sizeof(actuator_param_t)];
+StaticQueue_t actuator2_param_queue_cbm;
+
+freertos_osal_queue_static_attr_t actuator2_param_queue_attr = {
+    .queue_buffer = actuator2_param_queue_buffer,
+    .cb_mem = &actuator2_param_queue_cbm,
 };
