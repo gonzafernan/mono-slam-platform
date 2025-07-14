@@ -27,9 +27,8 @@ int app_init(void *imu, actuator_args_t *actuator1_args,
     actuator1_args->encoder_sign = (LEFT_WHEEL_INDEX == 0)
                                        ? LEFT_WHEEL_ENCODER_SIGN
                                        : RIGHT_WHEEL_ENCODER_SIGN;
-    actuator1_args->hbridge_dir = (LEFT_WHEEL_INDEX == 0)
-                                       ? LEFT_WHEEL_MOTOR_DIR
-                                       : RIGHT_WHEEL_MOTOR_DIR;
+    actuator1_args->hbridge_dir =
+        (LEFT_WHEEL_INDEX == 0) ? LEFT_WHEEL_MOTOR_DIR : RIGHT_WHEEL_MOTOR_DIR;
     if (actuator_init(&robot_platform.actuator1, &actuator1_task_attr,
                       actuator1_args) < 0) {
         printf("Actuator 1 initialization failed.\r\n");
@@ -39,9 +38,8 @@ int app_init(void *imu, actuator_args_t *actuator1_args,
     actuator2_args->encoder_sign = (LEFT_WHEEL_INDEX == 1)
                                        ? LEFT_WHEEL_ENCODER_SIGN
                                        : RIGHT_WHEEL_ENCODER_SIGN;
-    actuator2_args->hbridge_dir = (LEFT_WHEEL_INDEX == 1)
-                                       ? LEFT_WHEEL_MOTOR_DIR
-                                       : RIGHT_WHEEL_MOTOR_DIR;
+    actuator2_args->hbridge_dir =
+        (LEFT_WHEEL_INDEX == 1) ? LEFT_WHEEL_MOTOR_DIR : RIGHT_WHEEL_MOTOR_DIR;
     if (actuator_init(&robot_platform.actuator2, &actuator2_task_attr,
                       actuator2_args) < 0) {
         printf("Actuator 2 initialization failed.\r\n");

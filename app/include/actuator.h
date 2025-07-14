@@ -14,8 +14,31 @@ extern "C" {
 #include "hbridge_driver.h"
 #include "pid.h"
 
+/**
+ * @brief Actuator state sample structure
+ * This structure holds the actuator state data.
+ */
 typedef struct {
-    void *task_handle;
+    float angular_position; /*!> Actuator angular position */
+    float angular_velocity; /*!> Actuator angular velocity */
+} actuator_state_sample_t;
+
+/**
+ * @brief Actuator parameters structure
+ * The structure holds the actuator parameters to be set.
+ */
+typedef struct {
+    float kp;    /*!> Controller proportional gain */
+    float ki;    /*!> Controller integral gain */
+    float kd;    /*!> Controller derivative gain */
+    float tau;   /*!> Controller derivative filter constant */
+    float alpha; /*!> Encoder filter constant  */
+} actuator_param_t;
+
+typedef struct {
+    void *task_handle;                // Actuator control task handle
+    void *state_queue_handle;         // Queue state handle
+    void *param_queue_handle;         // Queue state handle
     encoder_t encoder;                // Pointer to the first encoder
     hbridge_t hbridge;                // Pointer to the H-bridge driver
     int8_t encoder_sign;              // Encoder sign (-1, 1)
@@ -32,6 +55,8 @@ typedef struct {
     void *port_hbridge_in2;        // Pointer to the H-bridge IN2 port context
     int8_t encoder_sign;           // Encoder sign (-1, 1)
     uint8_t hbridge_dir;           // H-bridge direction (0, 1)
+    void *state_queue_attr;        // Pointer to actuator state queue attributes
+    void *param_queue_attr;  // Pointer to actuator parameters queue attributes
 } actuator_args_t;
 
 /**
