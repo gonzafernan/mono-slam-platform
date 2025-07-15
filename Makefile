@@ -52,6 +52,7 @@ app/src/actuator.c \
 app/src/pid.c \
 app/src/sliding_mode_diff.c \
 app/src/exponential_filter.c \
+app/src/diff_drive.c \
 app/platform/stm32f4/stm32f4_encoder_port.c \
 app/platform/stm32f4/stm32f4_debug.c \
 app/middleware/freertos/freertos_osal_port.c \
