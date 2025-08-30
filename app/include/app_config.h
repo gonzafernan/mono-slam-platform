@@ -30,8 +30,8 @@ extern "C" {
 
 #define ACTUATOR_TASK_STACK_SIZE 512  /// Stack size for the actuator task
 
-#define PLATFORM_WIDTH_MM 160  /// Platform width in milimeters
-#define WHEEL_DIAMETER_MM 65   /// Wheel diameters in milimeters
+#define PLATFORM_WIDTH_MM 160.0  /// Platform width in milimeters
+#define WHEEL_DIAMETER_MM 65.0   /// Wheel diameters in milimeters
 
 #define LEFT_WHEEL_INDEX 0
 #define LEFT_WHEEL_MOTOR_DIR 0
