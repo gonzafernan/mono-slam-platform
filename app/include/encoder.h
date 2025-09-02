@@ -12,14 +12,12 @@ extern "C" {
 
 #include <stdint.h>
 #include "exponential_filter.h"
-#include "sliding_mode_diff.h"
 
 typedef struct {
     void *context;
     float counts_per_revolution;  // Counts per revolution
     uint16_t last_sample;         // Last sampled value
     int64_t accumulated_ticks;    // Accumulated ticks for position calculation
-    uint32_t last_timestamp;      // Last timestamp for velocity calculation
     exponential_filter_t diff_filter;  // Pointer to angular velocity filter
     float last_angular_position;       // Last angular position in radians
     float last_angular_velocity;       // Angular velocity in radians per second
@@ -34,11 +32,11 @@ typedef struct {
  * @param encoder Pointer to the encoder structure.
  * @param context Pointer to the encoder hardware context.
  * @param counts_per_revolution Number of counts per revolution for the encoder.
- * @param timestamp Initial timestamp for the encoder in miliseconds.
+ * @param filter_alpha Alpha value for encoder velocity filter.
  * @return 0 on success, -1 on failure.
  */
 int encoder_init(encoder_t *encoder, void *context, float counts_per_revolution,
-                 uint32_t timestamp);
+                 float filter_alpha);
 
 /**
  * @brief Samples the encoder and updates its angular position and velocity.
@@ -47,9 +45,9 @@ int encoder_init(encoder_t *encoder, void *context, float counts_per_revolution,
  * position and velocity, and updates the encoder structure accordingly.
  *
  * @param encoder Pointer to the encoder structure.
- * @param timestamp Current timestamp for the encoder in miliseconds.
+ * @param delta_time Time elapsed since last sample in seconds.
  */
-void encoder_sample(encoder_t *encoder, uint32_t timestamp);
+void encoder_sample(encoder_t *encoder, float delta_time);
 
 /**
  * @brief Gets the last angular position of the encoder.
