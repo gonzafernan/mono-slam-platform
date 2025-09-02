@@ -20,7 +20,7 @@ int actuator_init(actuator_t *actuator, void *task_attributes,
         1, sizeof(actuator_param_t), args->param_queue_attr);
 
     if (encoder_init(&actuator->encoder, args->port_encoder,
-                     args->counts_per_revolution, 0) < 0) {
+                     args->counts_per_revolution, 0.1f) < 0) {
         return -1;
     }
     if (hbridge_init(&actuator->hbridge, args->port_hbridge_pwm,
@@ -41,7 +41,6 @@ int actuator_init(actuator_t *actuator, void *task_attributes,
 static void actuator_task(void *argument) {
     actuator_t *actuator = (actuator_t *)argument;
     actuator_state_sample_t state_sample;
-    uint32_t time_ms;
     float output, angular_velocity;
 
     state_sample.angular_position = 0.0f;
@@ -49,9 +48,7 @@ static void actuator_task(void *argument) {
 
     for (;;) {
         osal_delay(10);
-        time_ms = osal_get_time_ms();
-
-        encoder_sample(&actuator->encoder, time_ms);
+        encoder_sample(&actuator->encoder, 0.01);
         state_sample.angular_position =
             actuator->encoder_sign *
             encoder_get_angular_position(&actuator->encoder);
