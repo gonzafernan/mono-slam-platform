@@ -1,0 +1,37 @@
+name: Build & Memory Check
+
+on:
+    push:
+        branches: ["develop", "main"]
+    pull_request:
+        branches: ["develop", "main"]
+
+jobs:
+    build-gnu-make:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                submodules: recursive
+                fetch-depth: 0
+
+            - name: Install toolchain & build deps
+              run: |
+                sudo apt-get update
+                sudo apt-get install -y gcc-arm-none-eabi binutils-arm-none-eabi make
+
+            - name: Micro-ROS fetch
+              run: docker pull microros/micro_ros_static_library_builder:humble
+
+            - name: Micro-ROS generation
+              run: |
+                printf 'y\n' | docker run -i --rm \
+                  -v $(pwd):/project \
+                  --env MICROROS_LIBRARY_FOLDER=micro_ros_stm32cubemx_utils/microros_static_library \
+                  microros/micro_ros_static_library_builder:humble
+
+            - name: Build (GNU Make)
+              run: make -j
+
+            - name: Memory check (Flash/RAM)
+              run: tools/check_memory.sh build/vizcacha-stm32f4.elf
