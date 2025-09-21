@@ -35,10 +35,10 @@ extern "C" {
 
 #define LEFT_WHEEL_INDEX 0
 #define LEFT_WHEEL_MOTOR_DIR 0
-#define LEFT_WHEEL_ENCODER_SIGN -1
+#define LEFT_WHEEL_ENCODER_SIGN 1
 
 #define RIGHT_WHEEL_MOTOR_DIR 1
-#define RIGHT_WHEEL_ENCODER_SIGN -1
+#define RIGHT_WHEEL_ENCODER_SIGN 1
 
 /// @brief IMU task attributes
 extern freertos_osal_task_static_attr_t imu_task_attr;

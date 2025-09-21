@@ -180,7 +180,7 @@ void StartDefaultTask(void *argument)
     rclc_support_init(&support, 0, NULL, &allocator);
 
     // create node
-    rclc_node_init_default(&node, "cubemx_node", "", &support);
+    rclc_node_init_default(&node, "vizcc_mcu", "", &support);
 
     // executor
     executor = rclc_executor_get_zero_initialized_executor();
@@ -226,4 +226,3 @@ void publisher_timer_callback(rcl_timer_t *timer, int64_t last_call_time) {
 }
 
 /* USER CODE END Application */
-
