@@ -130,7 +130,7 @@ void transport_joint_state_init(void *context) {
     rclc_publisher_init_default(
         &joint_state_publisher, transport_context->node,
         ROSIDL_GET_MSG_TYPE_SUPPORT(sensor_msgs, msg, JointState),
-        "joint_state");
+        "/vizcc_mcu/joint_states");
 
     // message initialization
     sensor_msgs__msg__JointState__init(&joint_state_msg);
@@ -193,11 +193,13 @@ bool transport_on_parameter_modification_callback(const Parameter *old_param,
     } else {
         printf("Parameter %s modified.", old_param->name.data);
         if (strcmp(new_param->name.data, "controller/kp") == 0) {
-            printf("Updated controller kp: %.4f", new_param->value.double_value);
+            printf("Updated controller kp: %.4f",
+                   new_param->value.double_value);
             app_update_actuator_kp((float)new_param->value.double_value);
         }
         if (strcmp(new_param->name.data, "controller/ki") == 0) {
-            printf("Updated controller ki: %.4f", new_param->value.double_value);
+            printf("Updated controller ki: %.4f",
+                   new_param->value.double_value);
             app_update_actuator_ki((float)new_param->value.double_value);
         }
     }
