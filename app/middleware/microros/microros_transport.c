@@ -152,7 +152,7 @@ void transport_imu_init(void *context) {
 
 void transport_imu_publish(void) {
     imu_sample_t sample;
-    imu_get_sample(&sample, OSAL_MAX_DELAY);
+    imu_get_sample(&sample, 0);
 
     imu_msg.linear_acceleration.x = sample.accel_x;
     imu_msg.linear_acceleration.y = sample.accel_y;
