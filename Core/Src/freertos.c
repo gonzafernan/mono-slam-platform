@@ -66,7 +66,8 @@ typedef StaticTask_t osStaticThreadDef_t;
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN Variables */
 static transport_context_t transport_context;
-static rcl_timer_t publisher_timer;
+static rcl_timer_t joint_state_publisher_timer;
+static rcl_timer_t imu_publisher_timer;
 /* USER CODE END Variables */
 /* Definitions for defaultTask */
 osThreadId_t defaultTaskHandle;
@@ -189,17 +190,23 @@ void StartDefaultTask(void *argument)
     unsigned int rcl_executor_timeout = 50;
     rclc_executor_set_timeout(&executor, RCL_MS_TO_NS(rcl_executor_timeout));
 
-    unsigned int rcl_timer_timeout = 100;
-    rclc_timer_init_default(&publisher_timer, &support, RCL_MS_TO_NS(rcl_timer_timeout),
+    unsigned int rcl_timer_timeout = 5;
+    rclc_timer_init_default(&joint_state_publisher_timer, &support, RCL_MS_TO_NS(rcl_timer_timeout),
                             publisher_timer_callback);
-    rclc_executor_add_timer(&executor, &publisher_timer);
+    rclc_executor_add_timer(&executor, &joint_state_publisher_timer);
+
+    rcl_timer_timeout = 10;
+    rclc_timer_init_default(&imu_publisher_timer, &support, RCL_MS_TO_NS(rcl_timer_timeout),
+                            publisher_timer_callback);
+    rclc_executor_add_timer(&executor, &imu_publisher_timer);
 
     // create app transport layer
     transport_context.node = &node;
     transport_context.executor = &executor;
     transport_imu_init((void *)&transport_context);
     transport_joint_state_init((void *)&transport_context);
-    transport_command_velocity_init((void *)&transport_context);
+    // transport_command_joint_space_init((void *)&transport_context);
+    // transport_command_velocity_init((void *)&transport_context);
     transport_parameter_server_init((void *)&transport_context);
 
     rclc_executor_prepare(&executor);
@@ -216,11 +223,12 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 }
 
 void publisher_timer_callback(rcl_timer_t *timer, int64_t last_call_time) {
-    if (timer != NULL) {
-        transport_imu_publish();
+    if (timer == &joint_state_publisher_timer) {
         transport_joint_state_publish();
+    } else if (timer == &imu_publisher_timer) {
+        transport_imu_publish();
     } else {
-        printf("Error timer callback execution without handle (line %d)\r\n",
+        printf("Error joint state publisher timer callback execution without handle (line %d)\r\n",
                __LINE__);
     }
 }
