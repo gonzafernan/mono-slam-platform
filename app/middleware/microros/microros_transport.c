@@ -66,7 +66,7 @@ int transport_command_joint_space_init(void *context) {
     cmd_joint_space_msg.data.capacity = ACTUATED_JOINTS_NUMBER;
     cmd_joint_space_msg.data.size = 0;
 
-    rc = rclc_subscription_init_default(
+    rc = rclc_subscription_init_best_effort(
         &cmd_joint_space_subscriber, transport_context->node,
         ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, Float32MultiArray),
         "/vizcc_mcu/wheel_vel_cmd");
