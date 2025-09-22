@@ -11,6 +11,12 @@ extern "C" {
 #endif
 
 /**
+ * @brief Initialize the transport layer for joint space command data.
+ * @param context Pointer to the transport context
+ */
+int transport_command_joint_space_init(void *context);
+
+/**
  * @brief Initialize the transport layer for velocity command data.
  * @param context Pointer to the transport context
  */

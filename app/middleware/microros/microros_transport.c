@@ -11,6 +11,7 @@
 #include <rclc_parameter/rclc_parameter.h>
 #include <sensor_msgs/msg/imu.h>
 #include <sensor_msgs/msg/joint_state.h>
+#include <std_msgs/msg/float32_multi_array.h>
 #include <stdio.h>
 
 #include "app.h"
@@ -18,6 +19,8 @@
 #include "imu.h"
 #include "microros_transport_config.h"
 #include "osal_port.h"
+#include "std_msgs/msg/detail/float32_multi_array__functions.h"
+#include "std_msgs/msg/detail/float32_multi_array__struct.h"
 
 rclc_parameter_server_t parameter_server;
 
@@ -31,24 +34,68 @@ rosidl_runtime_c__String name_array[ACTUATED_JOINTS_NUMBER];
 double position_array[ACTUATED_JOINTS_NUMBER];
 double velocity_array[ACTUATED_JOINTS_NUMBER];
 
-rcl_subscription_t cmd_vel_subscriber;
-geometry_msgs__msg__Twist cmd_vel_msg;
+rcl_subscription_t cmd_joint_space_subscriber;
+std_msgs__msg__Float32MultiArray cmd_joint_space_msg;
+float cmd_joint_space_array[ACTUATED_JOINTS_NUMBER];
 
-void cmd_vel_callback(const void *msgin) {
-    const geometry_msgs__msg__Twist *msg =
-        (const geometry_msgs__msg__Twist *)msgin;
-    app_update_setpoint(msg->linear.x, msg->angular.z);
+// geometry_msgs__msg__Twist cmd_vel_msg;
+
+static void cmd_joint_space_callback(const void *msgin) {
+    const std_msgs__msg__Float32MultiArray *msg =
+        (const std_msgs__msg__Float32MultiArray *)msgin;
+    float angular_velocity_left = msg->data.data[0];
+    float angular_velocity_right = msg->data.data[1];
+    // app_update_joint_space_setpoint(angular_velocity_left,
+    //                                 angular_velocity_right);
+    // printf("JS %.4f - %.4f\r\n", angular_velocity_left,
+    // angular_velocity_right);
 }
 
-void transport_command_velocity_init(void *context) {
+// void cmd_vel_callback(const void *msgin) {
+//     const geometry_msgs__msg__Twist *msg =
+//         (const geometry_msgs__msg__Twist *)msgin;
+//     app_update_setpoint(msg->linear.x, msg->angular.z);
+// }
+
+int transport_command_joint_space_init(void *context) {
     transport_context_t *transport_context = (transport_context_t *)context;
-    rclc_subscription_init_default(
-        &cmd_vel_subscriber, transport_context->node,
-        ROSIDL_GET_MSG_TYPE_SUPPORT(geometry_msgs, msg, Twist), "/cmd_vel");
-    rclc_executor_add_subscription(transport_context->executor,
-                                   &cmd_vel_subscriber, &cmd_vel_msg,
-                                   &cmd_vel_callback, ON_NEW_DATA);
+    rcl_ret_t rc;
+
+    std_msgs__msg__Float32MultiArray__init(&cmd_joint_space_msg);
+    cmd_joint_space_msg.data.data = cmd_joint_space_array;
+    cmd_joint_space_msg.data.capacity = ACTUATED_JOINTS_NUMBER;
+    cmd_joint_space_msg.data.size = 0;
+
+    rc = rclc_subscription_init_default(
+        &cmd_joint_space_subscriber, transport_context->node,
+        ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, Float32MultiArray),
+        "/vizcc_mcu/wheel_vel_cmd");
+    if (rc != RCL_RET_OK) {
+        printf("ERROR: Unable to create joint space command subscription.\r\n");
+        return -1;
+    }
+    rc = rclc_executor_add_subscription(
+        transport_context->executor, &cmd_joint_space_subscriber,
+        &cmd_joint_space_msg, &cmd_joint_space_callback, ON_NEW_DATA);
+    if (rc != RCL_RET_OK) {
+        printf(
+            "ERROR: Unable to add joint space command subscription to "
+            "executor.\r\n");
+        return -1;
+    }
+    return 0;
 }
+
+// void transport_command_velocity_init(void *context) {
+//     transport_context_t *transport_context = (transport_context_t *)context;
+//     rclc_subscription_init_default(
+//         &cmd_vel_subscriber, transport_context->node,
+//         ROSIDL_GET_MSG_TYPE_SUPPORT(geometry_msgs, msg, Twist),
+//         "/diff_drive_controller/cmd_vel");
+//     rclc_executor_add_subscription(transport_context->executor,
+//                                    &cmd_vel_subscriber, &cmd_vel_msg,
+//                                    &cmd_vel_callback, ON_NEW_DATA);
+// }
 
 void transport_imu_init(void *context) {
     transport_context_t *transport_context = (transport_context_t *)context;
