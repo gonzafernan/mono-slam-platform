@@ -187,15 +187,15 @@ void StartDefaultTask(void *argument)
     executor = rclc_executor_get_zero_initialized_executor();
     rclc_executor_init(&executor, &support.context,
                        RCLC_EXECUTOR_PARAMETER_SERVER_HANDLES + 5, &allocator);
-    unsigned int rcl_executor_timeout = 50;
+    unsigned int rcl_executor_timeout = 10;
     rclc_executor_set_timeout(&executor, RCL_MS_TO_NS(rcl_executor_timeout));
 
-    unsigned int rcl_timer_timeout = 5;
+    unsigned int rcl_timer_timeout = 10;
     rclc_timer_init_default(&joint_state_publisher_timer, &support, RCL_MS_TO_NS(rcl_timer_timeout),
                             publisher_timer_callback);
     rclc_executor_add_timer(&executor, &joint_state_publisher_timer);
 
-    rcl_timer_timeout = 10;
+    rcl_timer_timeout = 20;
     rclc_timer_init_default(&imu_publisher_timer, &support, RCL_MS_TO_NS(rcl_timer_timeout),
                             publisher_timer_callback);
     rclc_executor_add_timer(&executor, &imu_publisher_timer);
@@ -205,7 +205,10 @@ void StartDefaultTask(void *argument)
     transport_context.executor = &executor;
     transport_imu_init((void *)&transport_context);
     transport_joint_state_init((void *)&transport_context);
-    // transport_command_joint_space_init((void *)&transport_context);
+    if (transport_command_joint_space_init((void *)&transport_context) < 0) {
+        printf("ERROR: Unable to crete joint space command subscription (line %d).\r\n",
+               __LINE__);
+    }
     // transport_command_velocity_init((void *)&transport_context);
     transport_parameter_server_init((void *)&transport_context);
 
