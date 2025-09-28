@@ -1,20 +1,20 @@
 /* USER CODE BEGIN Header */
 /**
- ******************************************************************************
- * File Name          : freertos.c
- * Description        : Code for freertos applications
- ******************************************************************************
- * @attention
- *
- * Copyright (c) 2025 STMicroelectronics.
- * All rights reserved.
- *
- * This software is licensed under terms that can be found in the LICENSE file
- * in the root directory of this software component.
- * If no LICENSE file comes with this software, it is provided AS-IS.
- *
- ******************************************************************************
- */
+  ******************************************************************************
+  * File Name          : freertos.c
+  * Description        : Code for freertos applications
+  ******************************************************************************
+  * @attention
+  *
+  * Copyright (c) 2025 STMicroelectronics.
+  * All rights reserved.
+  *
+  * This software is licensed under terms that can be found in the LICENSE file
+  * in the root directory of this software component.
+  * If no LICENSE file comes with this software, it is provided AS-IS.
+  *
+  ******************************************************************************
+  */
 /* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
@@ -44,7 +44,6 @@
 
 #include <geometry_msgs/msg/quaternion.h>
 #include <geometry_msgs/msg/vector3.h>
-
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -114,19 +113,19 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE END Init */
 
   /* USER CODE BEGIN RTOS_MUTEX */
-    /* add mutexes, ... */
+  /* add mutexes, ... */
   /* USER CODE END RTOS_MUTEX */
 
   /* USER CODE BEGIN RTOS_SEMAPHORES */
-    /* add semaphores, ... */
+  /* add semaphores, ... */
   /* USER CODE END RTOS_SEMAPHORES */
 
   /* USER CODE BEGIN RTOS_TIMERS */
-    /* start timers, add new ones, ... */
+  /* start timers, add new ones, ... */
   /* USER CODE END RTOS_TIMERS */
 
   /* USER CODE BEGIN RTOS_QUEUES */
-    /* add queues, ... */
+  /* add queues, ... */
   /* USER CODE END RTOS_QUEUES */
 
   /* Create the thread(s) */
@@ -134,28 +133,28 @@ void MX_FREERTOS_Init(void) {
   defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
-    /* add threads, ... */
+  /* add threads, ... */
   /* USER CODE END RTOS_THREADS */
 
   /* USER CODE BEGIN RTOS_EVENTS */
-    /* add events, ... */
+  /* add events, ... */
   /* USER CODE END RTOS_EVENTS */
 
 }
 
 /* USER CODE BEGIN Header_StartDefaultTask */
 /**
- * @brief  Function implementing the defaultTask thread.
- * @param  argument: Not used
- * @retval None
- */
+  * @brief  Function implementing the defaultTask thread.
+  * @param  argument: Not used
+  * @retval None
+  */
 /* USER CODE END Header_StartDefaultTask */
 void StartDefaultTask(void *argument)
 {
   /* USER CODE BEGIN StartDefaultTask */
-    // micro-ROS configuration
+// micro-ROS configuration
     rmw_uros_set_custom_transport(
-        true, (void*)&huart1, cubemx_transport_open, cubemx_transport_close,
+        true, (void*)&huart2, cubemx_transport_open, cubemx_transport_close,
         cubemx_transport_write, cubemx_transport_read);
 
     rcl_allocator_t freeRTOS_allocator =
@@ -186,7 +185,7 @@ void StartDefaultTask(void *argument)
     // executor
     executor = rclc_executor_get_zero_initialized_executor();
     rclc_executor_init(&executor, &support.context,
-                       RCLC_EXECUTOR_PARAMETER_SERVER_HANDLES + 5, &allocator);
+                       RCLC_EXECUTOR_PARAMETER_SERVER_HANDLES + 7, &allocator);
     unsigned int rcl_executor_timeout = 10;
     rclc_executor_set_timeout(&executor, RCL_MS_TO_NS(rcl_executor_timeout));
 
@@ -210,7 +209,7 @@ void StartDefaultTask(void *argument)
                __LINE__);
     }
     // transport_command_velocity_init((void *)&transport_context);
-    transport_parameter_server_init((void *)&transport_context);
+    // transport_parameter_server_init((void *)&transport_context);
 
     rclc_executor_prepare(&executor);
     rclc_executor_spin(&executor);
@@ -235,5 +234,5 @@ void publisher_timer_callback(rcl_timer_t *timer, int64_t last_call_time) {
                __LINE__);
     }
 }
-
 /* USER CODE END Application */
+
