@@ -37,12 +37,13 @@ void app_get_joint_state(joint_state_t *joint_state);
 
 /**
  * @brief Update platform state setpoint.
- * @param linear_velocity Platform linear velocity setpoint in milimeters per
+ * @param angular_velocity_left Left wheel angular velocity in radians per
  * second
- * @param angular_velocity Platform angular velocity setpoint in radians per
+ * @param angular_velocity_right Right wheel angular velocity in radians per
  * second
  */
-void app_update_setpoint(float linear_velocity, float angular_velocity);
+void app_update_joint_space_setpoint(float angular_velocity_left,
+                                     float angular_velocity_right);
 
 /**
  * @brief Update actuator controller proportional gain

@@ -38,8 +38,6 @@ rcl_subscription_t cmd_joint_space_subscriber;
 std_msgs__msg__Float32MultiArray cmd_joint_space_msg;
 float cmd_joint_space_array[ACTUATED_JOINTS_NUMBER];
 
-// geometry_msgs__msg__Twist cmd_vel_msg;
-
 static void cmd_joint_space_callback(const void *msgin) {
     const std_msgs__msg__Float32MultiArray *msg =
         (const std_msgs__msg__Float32MultiArray *)msgin;
@@ -47,15 +45,8 @@ static void cmd_joint_space_callback(const void *msgin) {
     float angular_velocity_right = msg->data.data[1];
     // app_update_joint_space_setpoint(angular_velocity_left,
     //                                 angular_velocity_right);
-    // printf("JS %.4f - %.4f\r\n", angular_velocity_left,
-    // angular_velocity_right);
+    printf("JS %.4f - %.4f\r\n", angular_velocity_left, angular_velocity_right);
 }
-
-// void cmd_vel_callback(const void *msgin) {
-//     const geometry_msgs__msg__Twist *msg =
-//         (const geometry_msgs__msg__Twist *)msgin;
-//     app_update_setpoint(msg->linear.x, msg->angular.z);
-// }
 
 int transport_command_joint_space_init(void *context) {
     transport_context_t *transport_context = (transport_context_t *)context;
@@ -85,17 +76,6 @@ int transport_command_joint_space_init(void *context) {
     }
     return 0;
 }
-
-// void transport_command_velocity_init(void *context) {
-//     transport_context_t *transport_context = (transport_context_t *)context;
-//     rclc_subscription_init_default(
-//         &cmd_vel_subscriber, transport_context->node,
-//         ROSIDL_GET_MSG_TYPE_SUPPORT(geometry_msgs, msg, Twist),
-//         "/diff_drive_controller/cmd_vel");
-//     rclc_executor_add_subscription(transport_context->executor,
-//                                    &cmd_vel_subscriber, &cmd_vel_msg,
-//                                    &cmd_vel_callback, ON_NEW_DATA);
-// }
 
 void transport_imu_init(void *context) {
     transport_context_t *transport_context = (transport_context_t *)context;
@@ -239,12 +219,12 @@ bool transport_on_parameter_modification_callback(const Parameter *old_param,
         printf("Deleting parameter %s\r\n", old_param->name.data);
     } else {
         printf("Parameter %s modified.", old_param->name.data);
-        if (strcmp(new_param->name.data, "controller/kp") == 0) {
+        if (strcmp(new_param->name.data, "controller.kp") == 0) {
             printf("Updated controller kp: %.4f",
                    new_param->value.double_value);
             app_update_actuator_kp((float)new_param->value.double_value);
         }
-        if (strcmp(new_param->name.data, "controller/ki") == 0) {
+        if (strcmp(new_param->name.data, "controller.ki") == 0) {
             printf("Updated controller ki: %.4f",
                    new_param->value.double_value);
             app_update_actuator_ki((float)new_param->value.double_value);
@@ -268,24 +248,24 @@ void transport_parameter_server_init(void *context) {
                __LINE__);
     }
 
-    ret = rclc_add_parameter(&parameter_server, "controller/kp",
+    ret = rclc_add_parameter(&parameter_server, "controller.kp",
                              RCLC_PARAMETER_DOUBLE);
     if (ret != RCL_RET_OK) {
         printf("Error adding parameter kp to server (line %d)\r\n", __LINE__);
     }
-    ret = rclc_add_parameter_description(&parameter_server, "controller/kp",
+    ret = rclc_add_parameter_description(&parameter_server, "controller.kp",
                                          "Controller kp gain", "");
     if (ret != RCL_RET_OK) {
         printf("Error setting description for parameter kp (line %d)\r\n",
                __LINE__);
     }
 
-    ret = rclc_add_parameter(&parameter_server, "controller/ki",
+    ret = rclc_add_parameter(&parameter_server, "controller.ki",
                              RCLC_PARAMETER_DOUBLE);
     if (ret != RCL_RET_OK) {
         printf("Error adding parameter ki to server (line %d)\r\n", __LINE__);
     }
-    ret = rclc_add_parameter_description(&parameter_server, "controller/ki",
+    ret = rclc_add_parameter_description(&parameter_server, "controller.ki",
                                          "Controller ki gain", "");
     if (ret != RCL_RET_OK) {
         printf("Error setting description for parameter ki (line %d)\r\n",
