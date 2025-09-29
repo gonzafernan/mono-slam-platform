@@ -60,13 +60,14 @@ void app_get_joint_state(joint_state_t *joint_state) {
                        &joint_state->angular_velocity[actuator2_index]);
 }
 
-void app_update_setpoint(float linear_velocity, float angular_velocity) {
-    float angular_velocity_left =
-        (linear_velocity - angular_velocity * PLATFORM_WIDTH_MM / 2) /
-        (WHEEL_DIAMETER_MM / 2);
-    float angular_velocity_right =
-        (linear_velocity + angular_velocity * PLATFORM_WIDTH_MM / 2) /
-        (WHEEL_DIAMETER_MM / 2);
+void app_update_joint_space_setpoint(float angular_velocity_left,
+                                     float angular_velocity_right) {
+    // float angular_velocity_left =
+    //     (linear_velocity - angular_velocity * PLATFORM_WIDTH_MM / 2) /
+    //     (WHEEL_DIAMETER_MM / 2);
+    // float angular_velocity_right =
+    //     (linear_velocity + angular_velocity * PLATFORM_WIDTH_MM / 2) /
+    //     (WHEEL_DIAMETER_MM / 2);
     if (LEFT_WHEEL_INDEX == 0) {
         actuator_update_setpoint(&robot_platform.actuator1,
                                  angular_velocity_left);
