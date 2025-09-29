@@ -209,7 +209,7 @@ void StartDefaultTask(void *argument)
                __LINE__);
     }
     // transport_command_velocity_init((void *)&transport_context);
-    // transport_parameter_server_init((void *)&transport_context);
+    transport_parameter_server_init((void *)&transport_context);
 
     rclc_executor_prepare(&executor);
     rclc_executor_spin(&executor);
