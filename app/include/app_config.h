@@ -17,12 +17,14 @@ extern "C" {
 #include "freertos_osal_port_config.h"
 #include "icm20948_driver.h"
 
+#define SUPERVISOR_TASK_STACK_SIZE 512  /// Stack size for the supervisor task
+
 #define ACTUATED_JOINTS_NUMBER 2  /// Number of joints in the robot platform
 #define MAX_JOINT_NAME_LENGTH 32  /// Maximum length of joint names
 
 #define IMU_I2C_ADDRESS ICM20948_I2C_ADDRESS1  /// I2C address for the IMU
 #define IMU_I2C_TIMEOUT 1000                   /// Timeout for I2C operations
-#define IMU_TASK_STACK_SIZE 512                /// Stack size for the IMU task9
+#define IMU_TASK_STACK_SIZE 512                /// Stack size for the IMU task
 
 #define MOTOR_GEAR_RATIO 30              /// Gear ratio for the motor
 #define ENCODER_TICKS_PER_REVOLUTION 13  /// Encoder ticks per revolution
@@ -34,11 +36,11 @@ extern "C" {
 #define WHEEL_DIAMETER_MM 65.0   /// Wheel diameters in milimeters
 
 #define LEFT_WHEEL_INDEX 0
-#define LEFT_WHEEL_MOTOR_DIR 0
 #define LEFT_WHEEL_ENCODER_SIGN 1
-
-#define RIGHT_WHEEL_MOTOR_DIR 1
 #define RIGHT_WHEEL_ENCODER_SIGN 1
+
+/// @brief Supervisor task attributes
+extern freertos_osal_task_static_attr_t supervisor_task_attr;
 
 /// @brief IMU task attributes
 extern freertos_osal_task_static_attr_t imu_task_attr;

@@ -7,14 +7,24 @@
 #include "actuator.h"
 #include "imu.h"
 
+// supervisor task
+/// Buffer for the supervisor task stack
+uint32_t supervisor_stack_buffer[SUPERVISOR_TASK_STACK_SIZE];
+StaticTask_t supervisor_task_buffer;
+
+freertos_osal_task_static_attr_t supervisor_task_attr = {
+    .name = "supervisor_task",  /// Name of the supervisor task
+    .stack_size =
+        SUPERVISOR_TASK_STACK_SIZE,     /// Stack size for the supervisor task
+    .priority = osPriorityNormal,       /// Priority of the supervisor task
+    .stack = supervisor_stack_buffer,   /// Pointer to the stack
+    .cb_mem = &supervisor_task_buffer,  /// Pointer to the control block memory
+};
+
 // imu task
 /// Buffer for the IMU task stack
 uint32_t imu_stack_buffer[IMU_TASK_STACK_SIZE];
 StaticTask_t imu_task_buffer;
-
-// imu queue
-uint8_t imu_queue_buffer[sizeof(imu_sample_t)];  /// Buffer for the IMU queue
-StaticQueue_t imu_queue_cbm;  /// Control block memory for the IMU queue
 
 freertos_osal_task_static_attr_t imu_task_attr = {
     .name = "imu_task",                 /// Name of the IMU task
@@ -23,6 +33,10 @@ freertos_osal_task_static_attr_t imu_task_attr = {
     .stack = imu_stack_buffer,          /// Pointer to the stack
     .cb_mem = &imu_task_buffer,         /// Pointer to the control block memory
 };
+
+// imu queue
+uint8_t imu_queue_buffer[sizeof(imu_sample_t)];  /// Buffer for the IMU queue
+StaticQueue_t imu_queue_cbm;  /// Control block memory for the IMU queue
 
 freertos_osal_queue_static_attr_t imu_queue_attr = {
     .queue_buffer = imu_queue_buffer,  /// Pointer to the queue buffer

@@ -42,9 +42,9 @@ typedef struct {
     encoder_t encoder;                // Pointer to the first encoder
     hbridge_t hbridge;                // Pointer to the H-bridge driver
     int8_t encoder_sign;              // Encoder sign (-1, 1)
-    uint8_t hbridge_dir;              // H-bridge direction (0, 1)
     pid_controller_t controller;      // Pointer to the actuator controller
     float angular_velocity_setpoint;  // Current angular velocity setpoint
+    char label[28];                   // Actuator label
 } actuator_t;
 
 typedef struct {
@@ -54,7 +54,6 @@ typedef struct {
     void *port_hbridge_in1;        // Pointer to the H-bridge IN1 port context
     void *port_hbridge_in2;        // Pointer to the H-bridge IN2 port context
     int8_t encoder_sign;           // Encoder sign (-1, 1)
-    uint8_t hbridge_dir;           // H-bridge direction (0, 1)
     void *state_queue_attr;        // Pointer to actuator state queue attributes
     void *param_queue_attr;  // Pointer to actuator parameters queue attributes
 } actuator_args_t;

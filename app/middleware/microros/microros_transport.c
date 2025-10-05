@@ -43,9 +43,8 @@ static void cmd_joint_space_callback(const void *msgin) {
         (const std_msgs__msg__Float32MultiArray *)msgin;
     float angular_velocity_left = msg->data.data[0];
     float angular_velocity_right = msg->data.data[1];
-    // app_update_joint_space_setpoint(angular_velocity_left,
-    //                                 angular_velocity_right);
-    printf("JS %.4f - %.4f\r\n", angular_velocity_left, angular_velocity_right);
+    app_update_joint_space_setpoint(angular_velocity_left,
+                                    angular_velocity_right);
 }
 
 int transport_command_joint_space_init(void *context) {
