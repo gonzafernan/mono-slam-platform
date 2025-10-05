@@ -3,9 +3,12 @@
  * @brief Actuator control module for handling actuator operations.
  */
 
-#include "actuator.h"
 #include <math.h>
 #include <stddef.h>
+#include <stdio.h>
+
+#include "actuator.h"
+#include "hbridge_driver.h"
 #include "osal_port.h"
 
 static void actuator_task(void *argument);
@@ -29,11 +32,10 @@ int actuator_init(actuator_t *actuator, void *task_attributes,
     }
     actuator->angular_velocity_setpoint = 0.0f;
     actuator->encoder_sign = args->encoder_sign;
-    actuator->hbridge_dir = args->hbridge_dir;
     pid_init(&actuator->controller);
     pid_set_output_range(&actuator->controller, -100.0f, 100.0f);
-    pid_set_integral_range(&actuator->controller, -100.0f, 100.0f);
-    pid_set_kp(&actuator->controller, 0.0);
+    pid_set_integral_range(&actuator->controller, -25.0f, 25.0f);
+    pid_set_kp(&actuator->controller, 8.0);
     pid_set_ki(&actuator->controller, 0.0);
     return 0;
 }
@@ -59,13 +61,7 @@ static void actuator_task(void *argument) {
                              (void *)&state_sample);
 
         output = pid_update(&actuator->controller, angular_velocity, 0.01);
-        if (output < 0.0f) {
-            hbridge_set_output(&actuator->hbridge, actuator->hbridge_dir,
-                               -output);
-        } else {
-            hbridge_set_output(&actuator->hbridge, actuator->hbridge_dir,
-                               output);
-        }
+        hbridge_set_output_signed(&actuator->hbridge, output);
     }
 }
 

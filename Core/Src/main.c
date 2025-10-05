@@ -99,8 +99,8 @@ actuator_args_t actuator1_args = {
     .counts_per_revolution = MOTOR_GEAR_RATIO * ENCODER_TICKS_MULTIPLIER *
                              ENCODER_TICKS_PER_REVOLUTION,
     .port_hbridge_pwm = (void *)&port_hbridge1_pwm,
-    .port_hbridge_in1 = (void *)&port_hbridge1_in1,
-    .port_hbridge_in2 = (void *)&port_hbridge1_in2,
+    .port_hbridge_in1 = (void *)&port_hbridge2_in1,
+    .port_hbridge_in2 = (void *)&port_hbridge2_in2,
     .state_queue_attr = (void *)&actuator1_state_queue_attr,
     .param_queue_attr = (void *)&actuator1_param_queue_attr,
 };
@@ -110,8 +110,8 @@ actuator_args_t actuator2_args = {
     .counts_per_revolution = MOTOR_GEAR_RATIO * ENCODER_TICKS_MULTIPLIER *
                              ENCODER_TICKS_PER_REVOLUTION,
     .port_hbridge_pwm = (void *)&port_hbridge2_pwm,
-    .port_hbridge_in1 = (void *)&port_hbridge2_in1,
-    .port_hbridge_in2 = (void *)&port_hbridge2_in2,
+    .port_hbridge_in1 = (void *)&port_hbridge1_in2,
+    .port_hbridge_in2 = (void *)&port_hbridge1_in1,
     .state_queue_attr = (void *)&actuator2_state_queue_attr,
     .param_queue_attr = (void *)&actuator2_param_queue_attr,
 };

@@ -4,3 +4,4 @@ build/
 Testing/
 .cache/
 .venv/
+compile_commands.json

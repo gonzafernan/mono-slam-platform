@@ -4,21 +4,28 @@
  *
  */
 
-#include "app.h"
 #include <stdio.h>
+
+#include "app.h"
 #include "app_config.h"
 #include "imu.h"
+#include "osal_port.h"
 
 static struct {
-    void *imu;            /*!> Pointer to the IMU context */
-    actuator_t actuator1; /*!> Actuator 1 structure */
-    actuator_t actuator2; /*!> Actuator 2 structure */
+    void *supervisor_task_handle; /*!> Supervisor task handle */
+    void *imu;                    /*!> Pointer to the IMU context */
+    actuator_t actuator1;         /*!> Actuator 1 structure */
+    actuator_t actuator2;         /*!> Actuator 2 structure */
 } robot_platform;
+
+static void supervisor_task(void *argument);
 
 int app_init(void *imu, actuator_args_t *actuator1_args,
              actuator_args_t *actuator2_args) {
-    robot_platform.imu = imu;
+    robot_platform.supervisor_task_handle = osal_task_static_create(
+        supervisor_task, NULL, (void *)&supervisor_task_attr);
 
+    robot_platform.imu = imu;
     if (imu_init(robot_platform.imu, IMU_I2C_ADDRESS, IMU_I2C_TIMEOUT,
                  &imu_task_attr) < 0) {
         printf("IMU initialization failed.\r\n");
@@ -27,8 +34,7 @@ int app_init(void *imu, actuator_args_t *actuator1_args,
     actuator1_args->encoder_sign = (LEFT_WHEEL_INDEX == 0)
                                        ? LEFT_WHEEL_ENCODER_SIGN
                                        : RIGHT_WHEEL_ENCODER_SIGN;
-    actuator1_args->hbridge_dir =
-        (LEFT_WHEEL_INDEX == 0) ? LEFT_WHEEL_MOTOR_DIR : RIGHT_WHEEL_MOTOR_DIR;
+    robot_platform.actuator1.label[0] = '1';
     if (actuator_init(&robot_platform.actuator1, &actuator1_task_attr,
                       actuator1_args) < 0) {
         printf("Actuator 1 initialization failed.\r\n");
@@ -38,8 +44,7 @@ int app_init(void *imu, actuator_args_t *actuator1_args,
     actuator2_args->encoder_sign = (LEFT_WHEEL_INDEX == 1)
                                        ? LEFT_WHEEL_ENCODER_SIGN
                                        : RIGHT_WHEEL_ENCODER_SIGN;
-    actuator2_args->hbridge_dir =
-        (LEFT_WHEEL_INDEX == 1) ? LEFT_WHEEL_MOTOR_DIR : RIGHT_WHEEL_MOTOR_DIR;
+    robot_platform.actuator2.label[0] = '2';
     if (actuator_init(&robot_platform.actuator2, &actuator2_task_attr,
                       actuator2_args) < 0) {
         printf("Actuator 2 initialization failed.\r\n");
@@ -49,15 +54,40 @@ int app_init(void *imu, actuator_args_t *actuator1_args,
     return 0;
 }
 
+static void supervisor_task(void *argument) {
+    for (;;) {
+        osal_delay(500);
+        printf("ACT%s: SET: %f - IN %f - ERR %f\r\n",
+               robot_platform.actuator1.label,
+               robot_platform.actuator1.controller.setpoint,
+               robot_platform.actuator1.encoder.last_angular_velocity,
+               robot_platform.actuator1.controller.error_integral);
+        printf("ACT%s: SET: %f - IN %f - ERR %f\r\n",
+               robot_platform.actuator2.label,
+               robot_platform.actuator2.controller.setpoint,
+               robot_platform.actuator2.encoder.last_angular_velocity,
+               robot_platform.actuator2.controller.error_integral);
+    }
+}
+
 void app_get_joint_state(joint_state_t *joint_state) {
-    uint8_t actuator1_index = (LEFT_WHEEL_INDEX == 0) ? 1 : 0;
-    uint8_t actuator2_index = (LEFT_WHEEL_INDEX == 1) ? 1 : 0;
-    actuator_get_state(&robot_platform.actuator1,
-                       &joint_state->angular_position[actuator1_index],
-                       &joint_state->angular_velocity[actuator1_index]);
-    actuator_get_state(&robot_platform.actuator2,
-                       &joint_state->angular_position[actuator2_index],
-                       &joint_state->angular_velocity[actuator2_index]);
+    if (LEFT_WHEEL_INDEX == 0) {
+        // actuator1 -> LEFT (index 0), actuator2 -> RIGHT (index 1)
+        actuator_get_state(&robot_platform.actuator1,
+                           &joint_state->angular_position[0],
+                           &joint_state->angular_velocity[0]);
+        actuator_get_state(&robot_platform.actuator2,
+                           &joint_state->angular_position[1],
+                           &joint_state->angular_velocity[1]);
+    } else {
+        // actuator1 -> RIGHT (index 1), actuator2 -> LEFT (index 0)
+        actuator_get_state(&robot_platform.actuator1,
+                           &joint_state->angular_position[1],
+                           &joint_state->angular_velocity[1]);
+        actuator_get_state(&robot_platform.actuator2,
+                           &joint_state->angular_position[0],
+                           &joint_state->angular_velocity[0]);
+    }
 }
 
 void app_update_joint_space_setpoint(float angular_velocity_left,
