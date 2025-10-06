@@ -21,6 +21,20 @@ freertos_osal_task_static_attr_t supervisor_task_attr = {
     .cb_mem = &supervisor_task_buffer,  /// Pointer to the control block memory
 };
 
+// transport task
+/// Buffer for the transport task stack
+uint32_t transport_stack_buffer[TRANSPORT_TASK_STACK_SIZE];
+StaticTask_t transport_task_buffer;
+
+freertos_osal_task_static_attr_t transport_task_attr = {
+    .name = "transport_task",  /// Name of the trasnport task
+    .stack_size =
+        TRANSPORT_TASK_STACK_SIZE,     /// Stack size for the trasnport task
+    .priority = osPriorityNormal,      /// Priority of the IMU task
+    .stack = transport_stack_buffer,   /// Pointer to the stack
+    .cb_mem = &transport_task_buffer,  /// Pointer to the control block memory
+};
+
 // imu task
 /// Buffer for the IMU task stack
 uint32_t imu_stack_buffer[IMU_TASK_STACK_SIZE];

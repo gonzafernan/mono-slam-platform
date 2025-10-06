@@ -168,7 +168,7 @@ int main(void)
   MX_TIM4_Init();
   /* USER CODE BEGIN 2 */
   debug_init(&huart3);
-  if (app_init(&hi2c1, &actuator1_args, &actuator2_args) < 0) {
+  if (app_init((void *)&huart2, (void *)&hi2c1, &actuator1_args, &actuator2_args) < 0) {
       Error_Handler();
   }
   /* USER CODE END 2 */
@@ -177,7 +177,7 @@ int main(void)
   osKernelInitialize();
 
   /* Call init function for freertos objects (in cmsis_os2.c) */
-  MX_FREERTOS_Init();
+  // MX_FREERTOS_Init();
 
   /* Start scheduler */
   osKernelStart();

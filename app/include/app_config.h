@@ -17,6 +17,8 @@ extern "C" {
 #include "freertos_osal_port_config.h"
 #include "icm20948_driver.h"
 
+#define TRANSPORT_TASK_STACK_SIZE 512  /// Stack size for the transport task
+
 #define SUPERVISOR_TASK_STACK_SIZE 512  /// Stack size for the supervisor task
 
 #define ACTUATED_JOINTS_NUMBER 2  /// Number of joints in the robot platform
@@ -38,6 +40,9 @@ extern "C" {
 #define LEFT_WHEEL_INDEX 0
 #define LEFT_WHEEL_ENCODER_SIGN 1
 #define RIGHT_WHEEL_ENCODER_SIGN 1
+
+/// @brief Transport task attributes
+extern freertos_osal_task_static_attr_t transport_task_attr;
 
 /// @brief Supervisor task attributes
 extern freertos_osal_task_static_attr_t supervisor_task_attr;

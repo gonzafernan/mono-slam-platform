@@ -168,7 +168,6 @@ C_INCLUDES =  \
 -Iapp/include \
 -Iapp/platform/stm32f4 \
 -Iapp/middleware/freertos \
--Iapp/middleware/microros \
 -Ilib/device_drivers/include \
 -Ilib/device_drivers/platform/stm32f4 \
 -IDrivers/CMSIS/Include

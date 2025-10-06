@@ -10,8 +10,10 @@
 #include "app_config.h"
 #include "imu.h"
 #include "osal_port.h"
+#include "transport.h"
 
 static struct {
+    void *transport;              /*!> Pointer to transport layer context */
     void *supervisor_task_handle; /*!> Supervisor task handle */
     void *imu;                    /*!> Pointer to the IMU context */
     actuator_t actuator1;         /*!> Actuator 1 structure */
@@ -20,15 +22,21 @@ static struct {
 
 static void supervisor_task(void *argument);
 
-int app_init(void *imu, actuator_args_t *actuator1_args,
+int app_init(void *transport, void *imu, actuator_args_t *actuator1_args,
              actuator_args_t *actuator2_args) {
+    robot_platform.transport = transport;
+    if (transport_init(robot_platform.transport, (void *)&transport_task_attr) <
+        0) {
+        printf("Trasnport layer initialization failed.\r\n");
+    }
+
     robot_platform.supervisor_task_handle = osal_task_static_create(
         supervisor_task, NULL, (void *)&supervisor_task_attr);
 
     robot_platform.imu = imu;
     if (imu_init(robot_platform.imu, IMU_I2C_ADDRESS, IMU_I2C_TIMEOUT,
                  &imu_task_attr) < 0) {
-        printf("IMU initialization failed.\r\n");
+        printf("IMU initialization failed (line %d).\r\n", __LINE__);
         return -1;
     }
     actuator1_args->encoder_sign = (LEFT_WHEEL_INDEX == 0)
@@ -57,16 +65,16 @@ int app_init(void *imu, actuator_args_t *actuator1_args,
 static void supervisor_task(void *argument) {
     for (;;) {
         osal_delay(500);
-        printf("ACT%s: SET: %f - IN %f - ERR %f\r\n",
-               robot_platform.actuator1.label,
-               robot_platform.actuator1.controller.setpoint,
-               robot_platform.actuator1.encoder.last_angular_velocity,
-               robot_platform.actuator1.controller.error_integral);
-        printf("ACT%s: SET: %f - IN %f - ERR %f\r\n",
-               robot_platform.actuator2.label,
-               robot_platform.actuator2.controller.setpoint,
-               robot_platform.actuator2.encoder.last_angular_velocity,
-               robot_platform.actuator2.controller.error_integral);
+        // printf("ACT%s: SET: %f - IN %f - ERR %f\r\n",
+        //        robot_platform.actuator1.label,
+        //        robot_platform.actuator1.controller.setpoint,
+        //        robot_platform.actuator1.encoder.last_angular_velocity,
+        //        robot_platform.actuator1.controller.error_integral);
+        // printf("ACT%s: SET: %f - IN %f - ERR %f\r\n",
+        //        robot_platform.actuator2.label,
+        //        robot_platform.actuator2.controller.setpoint,
+        //        robot_platform.actuator2.encoder.last_angular_velocity,
+        //        robot_platform.actuator2.controller.error_integral);
     }
 }
 

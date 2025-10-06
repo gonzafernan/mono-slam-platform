@@ -21,12 +21,13 @@ typedef struct {
 
 /**
  * @brief Application initialization
- * @param imu Pointer to the IMU context
- * @param actuator1_args Pointer to the actuator 1 arguments
- * @param actuator2_args Pointer to the actuator 2 arguments
- * @return 0 on success, -1 on failure
+ * @param transport Pointer to the transport layer context.
+ * @param imu Pointer to the IMU context.
+ * @param actuator1_args Pointer to the actuator 1 arguments.
+ * @param actuator2_args Pointer to the actuator 2 arguments.
+ * @return 0 on success, -1 on failure.
  */
-int app_init(void *imu, actuator_args_t *actuator1_args,
+int app_init(void *transport, void *imu, actuator_args_t *actuator1_args,
              actuator_args_t *actuator2_args);
 
 /**
