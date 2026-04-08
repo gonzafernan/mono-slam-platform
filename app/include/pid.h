@@ -100,6 +100,12 @@ void pid_set_setpoint(pid_controller_t *self, float value);
  */
 float pid_update(pid_controller_t *self, float input, float delta_time);
 
+/**
+ * @brief Reset PID controller state.
+ * @param self Pointer to the PID controller handle
+ */
+void pid_reset(pid_controller_t *self);
+
 #ifdef __cplusplus
 }
 #endif

@@ -4,6 +4,7 @@
  */
 
 #include "pid.h"
+#include <math.h>
 
 static float clamp(float value, float low_limit, float high_limit) {
     if (value < low_limit) {
@@ -58,6 +59,10 @@ void pid_set_integral_range(pid_controller_t *self, float min_integral,
 }
 
 float pid_update(pid_controller_t *self, float input, float delta_time) {
+    if (!isfinite(input)) {
+        return clamp(0.0f, self->min_output, self->max_output);
+    }
+
     float error = self->setpoint - input;
 
     float proportional = self->kp * error;
@@ -82,4 +87,10 @@ float pid_update(pid_controller_t *self, float input, float delta_time) {
     self->prev_input = input;
 
     return clamp(output, self->min_output, self->max_output);
+}
+
+void pid_reset(pid_controller_t *self) {
+    self->error_integral = 0.0f;
+    self->input_derivative = 0.0f;
+    self->prev_input = 0.0f;
 }
