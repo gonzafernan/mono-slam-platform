@@ -94,6 +94,11 @@ stm32f4_pwm_port_t port_hbridge2_pwm = {
     .channel = TIM_CHANNEL_1,
 };
 
+/* NOTE: The IN1/IN2 direction pins are intentionally cross-wired between
+ * actuators to compensate for the physical PCB routing. Actuator 1 uses the
+ * direction pins of H-bridge 2, and actuator 2 uses the direction pins of
+ * H-bridge 1 (with IN1/IN2 also swapped). This was verified on hardware and
+ * documented in the development journal (2025-07-10). Do not "fix" this. */
 actuator_args_t actuator1_args = {
     .port_encoder = (void *)&port_encoder1,
     .counts_per_revolution = MOTOR_GEAR_RATIO * ENCODER_TICKS_MULTIPLIER *

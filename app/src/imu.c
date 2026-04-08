@@ -8,7 +8,6 @@
 
 #include "ak09916_driver.h"
 #include "app_config.h"
-#include "gpio.h"
 #include "icm20948_driver.h"
 #include "imu.h"
 #include "osal_port.h"
@@ -85,7 +84,7 @@ static void imu_task(void *argument) {
     for (;;) {
         // wait notification from imu (accel/gyro) data ready
         // osal_task_notify_wait(OSAL_MAX_DELAY);
-        osDelay(100);
+        osal_delay(100);
         if (imu_read_accelerometer(&accel_x, &accel_y, &accel_z)) {
             sample.accel_x = 0.0;
             sample.accel_y = 0.0;
