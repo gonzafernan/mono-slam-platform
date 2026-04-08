@@ -131,8 +131,11 @@ TEST(PIDControllerTest, HandlesZeroDeltaTime) {
     pid_set_output_range(&pid, -1000.0f, 1000.0f);
     pid_set_kp(&pid, 1.0f);
     pid_set_kd(&pid, 1.0f);
+    pid_set_setpoint(&pid, 5.0f);
 
-    float output = pid_update(&pid, 1.0f, 0.0f);  // no time passed
+    float output = pid_update(&pid, 1.0f, 0.0f);
 
-    EXPECT_TRUE(std::isfinite(output));  // No NaN or Inf
+    EXPECT_TRUE(std::isfinite(output));       // no NaN or Inf
+    EXPECT_FLOAT_EQ(pid.error_integral, 0.0f); // integral must not accumulate
+    EXPECT_FLOAT_EQ(pid.input_derivative, 0.0f); // derivative zeroed on zero denom
 }

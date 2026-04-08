@@ -22,7 +22,7 @@ void pid_init(pid_controller_t *self) {
     self->tau = 0.0f;
 
     self->min_output = 0.0f;
-    self->max_output = 0.0;
+    self->max_output = 0.0f;
     self->min_integral = 0.0f;
     self->max_integral = 0.0f;
 
@@ -62,10 +62,15 @@ float pid_update(pid_controller_t *self, float input, float delta_time) {
 
     float proportional = self->kp * error;
     self->error_integral += delta_time * error;
-    self->input_derivative =
-        -(2.0f * self->kd * (input - self->prev_input) +
-          (2.0f * self->tau - delta_time) * self->input_derivative) /
-        (2.0f * self->tau + delta_time);
+    float input_derivative_denom = (2.0f * self->tau + delta_time);
+    if (input_derivative_denom == 0.0f) {
+        self->input_derivative = 0.0f;
+    } else {
+        self->input_derivative =
+            -(2.0f * self->kd * (input - self->prev_input) +
+              (2.0f * self->tau - delta_time) * self->input_derivative) /
+            input_derivative_denom;
+    }
 
     // integral clamping
     self->error_integral =
