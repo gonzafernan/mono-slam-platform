@@ -6,8 +6,11 @@
 #include "diff_drive.h"
 #include <math.h>
 
-void diff_drive_init(diff_drive_t *self, float wheel_diameter,
-                     float wheel_distance) {
+int diff_drive_init(diff_drive_t *self, float wheel_diameter,
+                    float wheel_distance) {
+    if (wheel_diameter <= 0 || wheel_distance <= 0) {
+        return -1;
+    }
     self->wheel_diameter = wheel_diameter;
     self->wheel_distance = wheel_distance;
     self->theta = 0.0f;
@@ -16,6 +19,7 @@ void diff_drive_init(diff_drive_t *self, float wheel_diameter,
     self->y = 0.0f;
     self->vx = 0.0f;
     self->vy = 0.0f;
+    return 0;
 }
 
 void diff_drive_map_wheels_to_body(diff_drive_t *self,

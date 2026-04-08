@@ -26,9 +26,10 @@ typedef struct {
  * @param self Pointer to the differential drive controller.
  * @param wheel_diameter Wheels diameter in milimeters.
  * @param wheel_distance Distance between wheels in milimeters.
+ * @return 0 on success, -1 on failure
  */
-void diff_drive_init(diff_drive_t *self, float wheel_diameter,
-                     float wheel_distance);
+int diff_drive_init(diff_drive_t *self, float wheel_diameter,
+                    float wheel_distance);
 
 /**
  * @brief Map wheels angular velocity to linear and angular velocity.
