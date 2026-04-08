@@ -34,4 +34,4 @@ jobs:
               run: make -j
 
             - name: Memory check (Flash/RAM)
-              run: tools/check_memory.sh build/vizcacha-stm32f4.elf
+              run: tools/check_memory.sh build/mono-slam-platform.elf
