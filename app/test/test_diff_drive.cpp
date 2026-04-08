@@ -157,3 +157,86 @@ TEST_F(DiffDriveTest, InverseKinematicsRoundtripRotationInPlace) {
     EXPECT_NEAR(omega_left_out, omega_left_in, 1e-4f);
     EXPECT_NEAR(omega_right_out, omega_right_in, 1e-4f);
 }
+
+// ----------------------------------------------------------------------------
+// Odometry
+// ----------------------------------------------------------------------------
+
+TEST_F(DiffDriveTest, OdometryHeadingIntegrates) {
+    diff_drive_update_kinematics(&diff_drive, 0.0f, 1.0f, 1.0f);
+    EXPECT_FLOAT_EQ(diff_drive.theta, 1.0f);
+}
+
+TEST_F(DiffDriveTest, OdometryZeroAngularVelocityKeepsHeading) {
+    diff_drive_update_kinematics(&diff_drive, 0.0f, 0.0f, 1.0f);
+    EXPECT_FLOAT_EQ(diff_drive.theta, 0.0f);
+}
+
+TEST_F(DiffDriveTest, OdometryVelocityProjectionAtZeroHeading) {
+    diff_drive_update_kinematics(&diff_drive, 100.0f, 0.0f, 1.0f);
+    EXPECT_FLOAT_EQ(diff_drive.vx, 100.0f);
+    EXPECT_NEAR(diff_drive.vy, 0.0f, 1e-4f);
+}
+
+TEST_F(DiffDriveTest, OdometryVelocityProjectionAtNinetyDegrees) {
+    diff_drive.theta = (float)M_PI / 2.0f;
+    diff_drive_update_kinematics(&diff_drive, 100.0f, 0.0f, 1.0f);
+    EXPECT_NEAR(diff_drive.vx, 0.0f, 1e-4f);
+    EXPECT_NEAR(diff_drive.vy, 100.0f, 1e-4f);
+}
+
+TEST_F(DiffDriveTest, OdometryPositionIntegratesAlongX) {
+    diff_drive_update_kinematics(&diff_drive, 100.0f, 0.0f, 1.0f);
+    EXPECT_FLOAT_EQ(diff_drive.x, 100.0f);
+    EXPECT_NEAR(diff_drive.y, 0.0f, 1e-4f);
+}
+
+TEST_F(DiffDriveTest, OdometryCircleReturnsNearOrigin) {
+    // radius = v / omega = 100 mm
+    const float linear_velocity = 100.0f;
+    const float angular_velocity = 1.0f;
+    const float dt = 0.001f;
+    const int steps = (int)(2.0f * (float)M_PI / (angular_velocity * dt));
+
+    for (int i = 0; i < steps; i++) {
+        diff_drive_update_kinematics(&diff_drive, linear_velocity,
+                                     angular_velocity, dt);
+    }
+
+    EXPECT_NEAR(diff_drive.x, 0.0f, 1.0f);
+    EXPECT_NEAR(diff_drive.y, 0.0f, 1.0f);
+}
+
+TEST_F(DiffDriveTest, OdometryZeroDeltaTimeChangesNothing) {
+    diff_drive_update_kinematics(&diff_drive, 100.0f, 1.0f, 0.0f);
+    EXPECT_FLOAT_EQ(diff_drive.theta, 0.0f);
+    EXPECT_FLOAT_EQ(diff_drive.x, 0.0f);
+    EXPECT_FLOAT_EQ(diff_drive.y, 0.0f);
+}
+
+TEST_F(DiffDriveTest, OdometryNegativeDeltaTimeChangesNothing) {
+    diff_drive_update_kinematics(&diff_drive, 100.0f, 1.0f, -1.0f);
+    EXPECT_FLOAT_EQ(diff_drive.theta, 0.0f);
+    EXPECT_FLOAT_EQ(diff_drive.x, 0.0f);
+    EXPECT_FLOAT_EQ(diff_drive.y, 0.0f);
+}
+
+TEST_F(DiffDriveTest, OdometryValidUpdateReturnsSuccess) {
+    EXPECT_EQ(diff_drive_update_kinematics(&diff_drive, 100.0f, 1.0f, 1.0f), 0);
+}
+
+TEST_F(DiffDriveTest, OdometryZeroDeltaTimeReturnsError) {
+    EXPECT_EQ(diff_drive_update_kinematics(&diff_drive, 100.0f, 1.0f, 0.0f), -1);
+}
+
+TEST_F(DiffDriveTest, OdometryNegativeDeltaTimeReturnsError) {
+    EXPECT_EQ(diff_drive_update_kinematics(&diff_drive, 100.0f, 1.0f, -1.0f), -1);
+}
+
+TEST_F(DiffDriveTest, OdometryHeadingStaysNormalised) {
+    for (int i = 0; i < 10000; i++) {
+        diff_drive_update_kinematics(&diff_drive, 0.0f, 0.1f, 0.1f);
+    }
+    EXPECT_GE(diff_drive.theta, -(float)M_PI);
+    EXPECT_LE(diff_drive.theta, (float)M_PI);
+}

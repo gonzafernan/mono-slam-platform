@@ -11,21 +11,21 @@ extern "C" {
 #endif
 
 typedef struct {
-    float wheel_diameter; /*!> Wheels diameter in milimeters. */
-    float wheel_distance; /*!> Distance between wheels in milimeters. */
-    float theta;          /*!> Cartesian angle in radians. */
-    float omega; /*!> Cartesian angular velocity in radians per second. */
-    float x;     /*!> Cartesian position in x axis in milimeters per second. */
-    float y;     /*!> Cartesian position in y axis in milimeters per second. */
-    float vx;    /*!> Cartesian velocity in x axis in milimeters. */
-    float vy;    /*!> Cartesian velocity in y axis in milimeters. */
+    float wheel_diameter; /*!< Wheels diameter in millimeters. */
+    float wheel_distance; /*!< Distance between wheels in millimeters. */
+    float theta;          /*!< Cartesian angle in radians. */
+    float omega; /*!< Cartesian angular velocity in radians per second. */
+    float x;     /*!< Cartesian position in x axis in millimeters. */
+    float y;     /*!< Cartesian position in y axis in millimeters. */
+    float vx;    /*!< Cartesian velocity in x axis in millimeters per second. */
+    float vy;    /*!< Cartesian velocity in y axis in millimeters per second. */
 } diff_drive_t;
 
 /**
  * @brief Differential drive controller initialization.
  * @param self Pointer to the differential drive controller.
- * @param wheel_diameter Wheels diameter in milimeters.
- * @param wheel_distance Distance between wheels in milimeters.
+ * @param wheel_diameter Wheels diameter in millimeters.
+ * @param wheel_distance Distance between wheels in millimeters.
  * @return 0 on success, -1 on failure
  */
 int diff_drive_init(diff_drive_t *self, float wheel_diameter,
@@ -48,7 +48,7 @@ void diff_drive_map_wheels_to_body(diff_drive_t *self,
 /**
  * @brief Map linear and angular velocity to wheels angular velocity.
  * @param self Pointer to the differential drive controller.
- * @param linear_velocity Linear velocity in milimeters per second.
+ * @param linear_velocity Linear velocity in millimeters per second.
  * @param angular_velocity Angular velocity in radians per second.
  * @param angular_velocity_left Pointer to mapped left wheel angular velocity.
  * @param angular_velocity_right Pointer to mapped right wheel angular velocity.
@@ -62,15 +62,16 @@ void diff_drive_map_body_to_wheels(diff_drive_t *self, float linear_velocity,
  * @brief Update controller with new angular and linear velocity.
  * Update controller kinematics.
  * @param self Pointer to the differential drive controller.
- * @param linear_velocity Linear velocity in milimeters per second.
+ * @param linear_velocity Linear velocity in millimeters per second.
  * @param angular_velocity Angular velocity in radians per second.
  * @param delta_time Time elapsed since last update in seconds.
+ * @return 0 on success, -1 on failure
  */
-void diff_drive_update_kinematics(diff_drive_t *self, float linear_velocity,
-                                  float angular_velocity, float delta_time);
+int diff_drive_update_kinematics(diff_drive_t *self, float linear_velocity,
+                                 float angular_velocity, float delta_time);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif  // DIFF_FRIVE_H
+#endif  // DIFF_DRIVE_H

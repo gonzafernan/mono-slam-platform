@@ -45,12 +45,17 @@ void diff_drive_map_body_to_wheels(diff_drive_t *self, float linear_velocity,
         (self->wheel_diameter / 2);
 }
 
-void diff_drive_update_kinematics(diff_drive_t *self, float linear_velocity,
-                                  float angular_velocity, float delta_time) {
+int diff_drive_update_kinematics(diff_drive_t *self, float linear_velocity,
+                                 float angular_velocity, float delta_time) {
+    if (delta_time <= 0) {
+        return -1;
+    }
     self->theta += angular_velocity * delta_time;
+    self->theta = remainderf(self->theta, 2.0f * (float)M_PI);
     self->omega = angular_velocity;
     self->vx = linear_velocity * cosf(self->theta);
     self->vy = linear_velocity * sinf(self->theta);
     self->x += self->vx * delta_time;
     self->y += self->vy * delta_time;
+    return 0;
 }
