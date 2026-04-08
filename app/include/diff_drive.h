@@ -38,11 +38,11 @@ void diff_drive_init(diff_drive_t *self, float wheel_diameter,
  * @param linear_velocity Pointer to mapped linear velocity.
  * @param angular_velocity Pointer to mapped angular velocity.
  */
-void diff_drive_map_wheel_to_platform(diff_drive_t *self,
-                                      float angular_velocity_left,
-                                      float angular_velocity_right,
-                                      float *linear_velocity,
-                                      float *angular_velocity);
+void diff_drive_map_wheels_to_body(diff_drive_t *self,
+                                   float angular_velocity_left,
+                                   float angular_velocity_right,
+                                   float *linear_velocity,
+                                   float *angular_velocity);
 
 /**
  * @brief Map linear and angular velocity to wheels angular velocity.
@@ -52,10 +52,10 @@ void diff_drive_map_wheel_to_platform(diff_drive_t *self,
  * @param angular_velocity_left Pointer to mapped left wheel angular velocity.
  * @param angular_velocity_right Pointer to mapped right wheel angular velocity.
  */
-void diff_drive_map_platform_to_wheel(diff_drive_t *self, float linear_velocity,
-                                      float angular_velocity,
-                                      float *angular_velocity_left,
-                                      float *angular_velocity_right);
+void diff_drive_map_body_to_wheels(diff_drive_t *self, float linear_velocity,
+                                   float angular_velocity,
+                                   float *angular_velocity_left,
+                                   float *angular_velocity_right);
 
 /**
  * @brief Update controller with new angular and linear velocity.

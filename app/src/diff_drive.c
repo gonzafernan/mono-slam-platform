@@ -18,27 +18,27 @@ void diff_drive_init(diff_drive_t *self, float wheel_diameter,
     self->vy = 0.0f;
 }
 
-void diff_drive_map_wheel_to_platform(diff_drive_t *self,
-                                      float angular_velocity_left,
-                                      float angular_velocity_right,
-                                      float *linear_velocity,
-                                      float *angular_velocity) {
+void diff_drive_map_wheels_to_body(diff_drive_t *self,
+                                   float angular_velocity_left,
+                                   float angular_velocity_right,
+                                   float *linear_velocity,
+                                   float *angular_velocity) {
     *linear_velocity = (angular_velocity_left + angular_velocity_right) *
                        self->wheel_diameter / 4;
     *angular_velocity = (angular_velocity_right - angular_velocity_left) *
                         (self->wheel_diameter / 2) / self->wheel_distance;
 }
 
-void diff_drive_map_platform_to_wheel(diff_drive_t *self, float linear_velocity,
-                                      float angular_velocity,
-                                      float *angular_velocity_left,
-                                      float *angular_velocity_right) {
+void diff_drive_map_body_to_wheels(diff_drive_t *self, float linear_velocity,
+                                   float angular_velocity,
+                                   float *angular_velocity_left,
+                                   float *angular_velocity_right) {
     *angular_velocity_left =
         (linear_velocity - angular_velocity * self->wheel_distance / 2) /
         (self->wheel_diameter / 2);
     *angular_velocity_right =
         (linear_velocity + angular_velocity * self->wheel_distance / 2) /
-        (self->wheel_distance / 2);
+        (self->wheel_diameter / 2);
 }
 
 void diff_drive_update_kinematics(diff_drive_t *self, float linear_velocity,
