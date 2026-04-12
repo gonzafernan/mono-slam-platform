@@ -25,11 +25,30 @@ extern "C" {
 void osal_delay(uint32_t delay_ms);
 
 /**
- * @brief Daly execution until a specific number of miliseconds.
- * @param last_exec_time Pointer to the execution time reference.
- * @param delay_ms Number of miliseconds to delay.
+ * @brief Loop timer for fixed-rate task scheduling.
+ *
+ * Maintains the last wake time internally. Call osal_loop_timer_init once
+ * before the task loop, then call osal_loop_timer_wait at the top of each
+ * iteration to block until the next period and obtain the real elapsed time.
  */
-void osal_delay_until(uint32_t *last_exec_time, uint32_t delay_ms);
+typedef struct {
+    uint32_t last_wake_time;
+    uint32_t period_ms;
+} osal_loop_timer_t;
+
+/**
+ * @brief Initialize a loop timer.
+ * @param timer Pointer to the loop timer.
+ * @param period_ms Period in milliseconds.
+ */
+void osal_loop_timer_init(osal_loop_timer_t *timer, uint32_t period_ms);
+
+/**
+ * @brief Block until the next period and return the real elapsed time.
+ * @param timer Pointer to the loop timer.
+ * @return Elapsed time since the previous call in seconds.
+ */
+float osal_loop_timer_wait(osal_loop_timer_t *timer);
 
 /**
  * @brief Get the current time in miliseconds (to be called from a task).

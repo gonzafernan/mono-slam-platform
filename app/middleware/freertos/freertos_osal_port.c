@@ -10,6 +10,7 @@
 
 #include "FreeRTOS.h"
 #include "freertos_osal_port_config.h"
+#include "osal_port.h"
 #include "queue.h"
 #include "task.h"
 
@@ -18,8 +19,16 @@ void osal_delay(uint32_t delay_ms) {
     vTaskDelay(ticks);
 }
 
-void osal_delay_until(uint32_t *last_exec_time, uint32_t delay_ms) {
-    vTaskDelayUntil((TickType_t *)last_exec_time, pdMS_TO_TICKS(delay_ms));
+void osal_loop_timer_init(osal_loop_timer_t *timer, uint32_t period_ms) {
+    timer->last_wake_time = xTaskGetTickCount();
+    timer->period_ms = period_ms;
+}
+
+float osal_loop_timer_wait(osal_loop_timer_t *timer) {
+    uint32_t prev_wake = timer->last_wake_time;
+    vTaskDelayUntil(&timer->last_wake_time, pdMS_TO_TICKS(timer->period_ms));
+    uint32_t now = xTaskGetTickCount();
+    return (float)(now - prev_wake) * portTICK_PERIOD_MS / 1000.0f;
 }
 
 uint32_t osal_get_time_ms(void) {

@@ -42,15 +42,15 @@ int actuator_init(actuator_t *actuator, void *task_attributes,
 
 static void actuator_task(void *argument) {
     actuator_t *actuator = (actuator_t *)argument;
-    actuator_state_sample_t state_sample;
-    float output, angular_velocity;
+    actuator_state_sample_t state_sample = {0.0f, 0.0f};
+    float output, angular_velocity, delta_time;
+    osal_loop_timer_t loop_timer;
 
-    state_sample.angular_position = 0.0f;
-    state_sample.angular_velocity = 0.0f;
+    osal_loop_timer_init(&loop_timer, 10);
 
     for (;;) {
-        osal_delay(10);
-        encoder_sample(&actuator->encoder, 0.01);
+        delta_time = osal_loop_timer_wait(&loop_timer);
+        encoder_sample(&actuator->encoder, delta_time);
         state_sample.angular_position =
             actuator->encoder_sign *
             encoder_get_angular_position(&actuator->encoder);
@@ -60,7 +60,8 @@ static void actuator_task(void *argument) {
         osal_queue_overwrite(actuator->state_queue_handle,
                              (void *)&state_sample);
 
-        output = pid_update(&actuator->controller, angular_velocity, 0.01);
+        output =
+            pid_update(&actuator->controller, angular_velocity, delta_time);
         hbridge_set_output_signed(&actuator->hbridge, output);
     }
 }
