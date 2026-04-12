@@ -154,7 +154,7 @@ void StartDefaultTask(void *argument)
   /* USER CODE BEGIN StartDefaultTask */
 // micro-ROS configuration
     rmw_uros_set_custom_transport(
-        true, (void*)&huart2, cubemx_transport_open, cubemx_transport_close,
+        true, (void*)&huart3, cubemx_transport_open, cubemx_transport_close,
         cubemx_transport_write, cubemx_transport_read);
 
     rcl_allocator_t freeRTOS_allocator =

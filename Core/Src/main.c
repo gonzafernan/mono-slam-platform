@@ -172,7 +172,7 @@ int main(void)
   MX_TIM3_Init();
   MX_TIM4_Init();
   /* USER CODE BEGIN 2 */
-  debug_init(&huart3);
+  debug_init(&huart2);
   if (app_init(&hi2c1, &actuator1_args, &actuator2_args) < 0) {
       Error_Handler();
   }
