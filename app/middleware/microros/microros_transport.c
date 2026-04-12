@@ -6,6 +6,7 @@
  */
 
 #include <geometry_msgs/msg/twist.h>
+#include <math.h>
 #include <rcl/rcl.h>
 #include <rclc/rclc.h>
 #include <rclc_parameter/rclc_parameter.h>
@@ -18,7 +19,6 @@
 #include "app_config.h"
 #include "imu.h"
 #include "microros_transport_config.h"
-#include "osal_port.h"
 #include "std_msgs/msg/detail/float32_multi_array__functions.h"
 #include "std_msgs/msg/detail/float32_multi_array__struct.h"
 
@@ -41,8 +41,22 @@ float cmd_joint_space_array[ACTUATED_JOINTS_NUMBER];
 static void cmd_joint_space_callback(const void *msgin) {
     const std_msgs__msg__Float32MultiArray *msg =
         (const std_msgs__msg__Float32MultiArray *)msgin;
+    if (msg->data.size < ACTUATED_JOINTS_NUMBER) {
+        printf(
+            "ERROR: wheel_vel_cmd: expected %d elements, got %zu. "
+            "Ignoring.\r\n",
+            ACTUATED_JOINTS_NUMBER, msg->data.size);
+        return;
+    }
     float angular_velocity_left = msg->data.data[0];
     float angular_velocity_right = msg->data.data[1];
+    if (!isfinite(angular_velocity_left) || !isfinite(angular_velocity_right)) {
+        printf(
+            "ERROR: wheel_vel_cmd: non-finite values (left=%.3f, right=%.3f). "
+            "Ignoring.\r\n",
+            (double)angular_velocity_left, (double)angular_velocity_right);
+        return;
+    }
     app_update_joint_space_setpoint(angular_velocity_left,
                                     angular_velocity_right);
 }
