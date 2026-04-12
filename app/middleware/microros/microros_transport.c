@@ -10,9 +10,11 @@
 #include <rcl/rcl.h>
 #include <rclc/rclc.h>
 #include <rclc_parameter/rclc_parameter.h>
+#include <rmw_microros/time_sync.h>
 #include <sensor_msgs/msg/imu.h>
 #include <sensor_msgs/msg/joint_state.h>
 #include <std_msgs/msg/float32_multi_array.h>
+#include <stdint.h>
 #include <stdio.h>
 
 #include "app.h"
@@ -146,6 +148,7 @@ void transport_imu_init(void *context) {
 void transport_imu_publish(void) {
     imu_sample_t sample;
     imu_get_sample(&sample, 0);
+    int64_t time_ns = rmw_uros_epoch_nanos();
 
     imu_msg.linear_acceleration.x = sample.accel_x;
     imu_msg.linear_acceleration.y = sample.accel_y;
@@ -156,6 +159,8 @@ void transport_imu_publish(void) {
     imu_msg.linear_acceleration_covariance[0] = sample.mag_x;
     imu_msg.linear_acceleration_covariance[1] = sample.mag_y;
     imu_msg.linear_acceleration_covariance[2] = sample.mag_z;
+    imu_msg.header.stamp.sec = (int32_t)(time_ns / 1000000000LL);
+    imu_msg.header.stamp.nanosec = (uint32_t)(time_ns % 1000000000LL);
 
     rcl_ret_t ret = rcl_publish(&imu_publisher, &imu_msg, NULL);
     if (ret != RCL_RET_OK) {
@@ -206,11 +211,14 @@ void transport_joint_state_init(void *context) {
 void transport_joint_state_publish(void) {
     joint_state_t joint_state;
     app_get_joint_state(&joint_state);
+    int64_t time_ns = rmw_uros_epoch_nanos();
 
     joint_state_msg.position.data[0] = joint_state.angular_position[0];
     joint_state_msg.position.data[1] = joint_state.angular_position[1];
     joint_state_msg.velocity.data[0] = joint_state.angular_velocity[0];
     joint_state_msg.velocity.data[1] = joint_state.angular_velocity[1];
+    joint_state_msg.header.stamp.sec = (int32_t)(time_ns / 1000000000LL);
+    joint_state_msg.header.stamp.nanosec = (uint32_t)(time_ns % 1000000000LL);
 
     rcl_ret_t ret = rcl_publish(&joint_state_publisher, &joint_state_msg, NULL);
     if (ret != RCL_RET_OK) {
