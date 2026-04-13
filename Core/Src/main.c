@@ -66,7 +66,7 @@ stm32f4_encoder_handle_t port_encoder2 = {
 
 stm32f4_gpio_port_t port_hbridge1_in1 = {
     .port = GPIOE,
-    .pin = GPIO_PIN_12,
+    .pin = GPIO_PIN_10,
 };
 
 stm32f4_gpio_port_t port_hbridge1_in2 = {
@@ -94,18 +94,13 @@ stm32f4_pwm_port_t port_hbridge2_pwm = {
     .channel = TIM_CHANNEL_1,
 };
 
-/* NOTE: The IN1/IN2 direction pins are intentionally cross-wired between
- * actuators to compensate for the physical PCB routing. Actuator 1 uses the
- * direction pins of H-bridge 2, and actuator 2 uses the direction pins of
- * H-bridge 1 (with IN1/IN2 also swapped). This was verified on hardware and
- * documented in the development journal (2025-07-10). Do not "fix" this. */
 actuator_args_t actuator1_args = {
     .port_encoder = (void *)&port_encoder1,
     .counts_per_revolution = MOTOR_GEAR_RATIO * ENCODER_TICKS_MULTIPLIER *
                              ENCODER_TICKS_PER_REVOLUTION,
     .port_hbridge_pwm = (void *)&port_hbridge1_pwm,
-    .port_hbridge_in1 = (void *)&port_hbridge2_in1,
-    .port_hbridge_in2 = (void *)&port_hbridge2_in2,
+    .port_hbridge_in1 = (void *)&port_hbridge1_in1,
+    .port_hbridge_in2 = (void *)&port_hbridge1_in2,
     .state_queue_attr = (void *)&actuator1_state_queue_attr,
     .param_queue_attr = (void *)&actuator1_param_queue_attr,
 };
@@ -115,8 +110,8 @@ actuator_args_t actuator2_args = {
     .counts_per_revolution = MOTOR_GEAR_RATIO * ENCODER_TICKS_MULTIPLIER *
                              ENCODER_TICKS_PER_REVOLUTION,
     .port_hbridge_pwm = (void *)&port_hbridge2_pwm,
-    .port_hbridge_in1 = (void *)&port_hbridge1_in2,
-    .port_hbridge_in2 = (void *)&port_hbridge1_in1,
+    .port_hbridge_in1 = (void *)&port_hbridge2_in1,
+    .port_hbridge_in2 = (void *)&port_hbridge2_in2,
     .state_queue_attr = (void *)&actuator2_state_queue_attr,
     .param_queue_attr = (void *)&actuator2_param_queue_attr,
 };
@@ -173,6 +168,7 @@ int main(void)
   MX_TIM4_Init();
   /* USER CODE BEGIN 2 */
   debug_init(&huart2);
+  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_12, GPIO_PIN_SET);  // Enable H-bridge (STBY)
   if (app_init(&hi2c1, &actuator1_args, &actuator2_args) < 0) {
       Error_Handler();
   }
