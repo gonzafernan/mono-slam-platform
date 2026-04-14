@@ -108,6 +108,15 @@ void osal_queue_overwrite(void *queue_handle, void *item);
  */
 int osal_queue_peek(void *queue_handle, void *item, uint32_t timeout);
 
+/**
+ * @brief Receive and remove an item from the queue.
+ * @param queue_handle Handle to the queue.
+ * @param item Pointer to the buffer where the item will be stored.
+ * @param timeout Timeout in milliseconds. Use OSAL_MAX_DELAY to block forever.
+ * @return 0 if an item was received, -1 if timeout occurred.
+ */
+int osal_queue_receive(void *queue_handle, void *item, uint32_t timeout);
+
 #ifdef __cplusplus
 }
 #endif

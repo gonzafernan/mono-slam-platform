@@ -39,6 +39,17 @@ extern "C" {
 #define LEFT_WHEEL_ENCODER_SIGN 1
 #define RIGHT_WHEEL_ENCODER_SIGN -1
 
+#define STATE_ESTIMATION_TASK_STACK_SIZE \
+    512  /// Stack size for state estimation task
+#define STATE_ESTIMATION_PERIOD_MS \
+    20  /// State estimation task period in milliseconds
+#define ACTUATOR_WATCHDOG_TIMEOUT_MS \
+    500  /// Supervisor watchdog timeout in milliseconds
+
+/// @brief Compile-time pose estimator selection. Define one of:
+///        POSE_ESTIMATOR_DIFF_DRIVE — dead-reckoning via diff_drive_t
+#define POSE_ESTIMATOR_DIFF_DRIVE
+
 /// @brief Supervisor task attributes
 extern freertos_osal_task_static_attr_t supervisor_task_attr;
 
@@ -65,6 +76,16 @@ extern freertos_osal_queue_static_attr_t actuator2_state_queue_attr;
 
 /// @brief Actuator 2 parameters queue attributes
 extern freertos_osal_queue_static_attr_t actuator2_param_queue_attr;
+
+/// @brief State estimation task attributes
+extern freertos_osal_task_static_attr_t state_estimation_task_attr;
+
+/// @brief Wheel velocity setpoint mailbox attributes (depth 1, overwrite
+/// semantics)
+extern freertos_osal_queue_static_attr_t wheel_vel_setpoint_mailbox_attr;
+
+/// @brief Odometry mailbox attributes (depth 1, overwrite semantics)
+extern freertos_osal_queue_static_attr_t odometry_mailbox_attr;
 
 #ifdef __cplusplus
 }

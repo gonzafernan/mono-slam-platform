@@ -13,11 +13,23 @@ extern "C" {
 
 #include "actuator.h"
 #include "app_config.h"
+#include "pose_estimator.h"
 
 typedef struct {
     double angular_position[ACTUATED_JOINTS_NUMBER];
     double angular_velocity[ACTUATED_JOINTS_NUMBER];
 } joint_state_t;
+
+/**
+ * @brief Wheel angular velocity setpoint. Carried by
+ * wheel_vel_setpoint_mailbox.
+ */
+typedef struct {
+    float angular_velocity_left;  /*!< Left wheel angular velocity setpoint in
+                                     radians per second. */
+    float angular_velocity_right; /*!< Right wheel angular velocity setpoint in
+                                     radians per second. */
+} wheel_vel_setpoint_t;
 
 /**
  * @brief Application initialization
@@ -36,14 +48,21 @@ int app_init(void *imu, actuator_args_t *actuator1_args,
 void app_get_joint_state(joint_state_t *joint_state);
 
 /**
- * @brief Update platform state setpoint.
- * @param angular_velocity_left Left wheel angular velocity in radians per
- * second
+ * @brief Write a wheel velocity setpoint to the supervisor mailbox.
+ * @param angular_velocity_left  Left wheel angular velocity in radians per
+ * second.
  * @param angular_velocity_right Right wheel angular velocity in radians per
- * second
+ * second.
  */
-void app_update_joint_space_setpoint(float angular_velocity_left,
-                                     float angular_velocity_right);
+void app_request_joint_space_setpoint(float angular_velocity_left,
+                                      float angular_velocity_right);
+
+/**
+ * @brief Read the latest odometry estimate (non-blocking).
+ * @param state Output: current pose estimate. Unchanged if no estimate is
+ * available yet.
+ */
+void app_get_odometry(pose_estimator_state_t *state);
 
 /**
  * @brief Update actuator controller proportional gain

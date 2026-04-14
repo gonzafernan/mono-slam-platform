@@ -49,6 +49,17 @@ void transport_joint_state_init(void *context);
 void transport_joint_state_publish(void);
 
 /**
+ * @brief Initialize the transport layer for odometry data.
+ * @param context Pointer to the transport context
+ */
+void transport_odometry_init(void *context);
+
+/**
+ * @brief Publish odometry data through the transport layer.
+ */
+void transport_odometry_publish(void);
+
+/**
  * @brief Initialize the transport layer for parameter server.
  * @param context Pointer to the transport context
  */

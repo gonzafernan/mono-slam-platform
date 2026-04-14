@@ -7,6 +7,7 @@
 
 #include <geometry_msgs/msg/twist.h>
 #include <math.h>
+#include <nav_msgs/msg/odometry.h>
 #include <rcl/rcl.h>
 #include <rclc/rclc.h>
 #include <rclc_parameter/rclc_parameter.h>
@@ -31,6 +32,9 @@ sensor_msgs__msg__Imu imu_msg;
 
 rcl_publisher_t joint_state_publisher;
 sensor_msgs__msg__JointState joint_state_msg;
+
+rcl_publisher_t odometry_publisher;
+nav_msgs__msg__Odometry odometry_msg;
 char name_buffer[ACTUATED_JOINTS_NUMBER][MAX_JOINT_NAME_LENGTH];
 rosidl_runtime_c__String name_array[ACTUATED_JOINTS_NUMBER];
 double position_array[ACTUATED_JOINTS_NUMBER];
@@ -59,8 +63,8 @@ static void cmd_joint_space_callback(const void *msgin) {
             (double)angular_velocity_left, (double)angular_velocity_right);
         return;
     }
-    app_update_joint_space_setpoint(angular_velocity_left,
-                                    angular_velocity_right);
+    app_request_joint_space_setpoint(angular_velocity_left,
+                                     angular_velocity_right);
 }
 
 int transport_command_joint_space_init(void *context) {
@@ -252,6 +256,51 @@ bool transport_on_parameter_modification_callback(const Parameter *old_param,
         }
     }
     return true;
+}
+
+void transport_odometry_init(void *context) {
+    transport_context_t *transport_context = (transport_context_t *)context;
+
+    rclc_publisher_init_default(
+        &odometry_publisher, transport_context->node,
+        ROSIDL_GET_MSG_TYPE_SUPPORT(nav_msgs, msg, Odometry),
+        "/vizcc_mcu/odom");
+
+    nav_msgs__msg__Odometry__init(&odometry_msg);
+    odometry_msg.header.frame_id.data = "odom";
+    odometry_msg.header.frame_id.size =
+        strlen(odometry_msg.header.frame_id.data);
+    odometry_msg.header.frame_id.capacity =
+        odometry_msg.header.frame_id.size + 1;
+    odometry_msg.child_frame_id.data = "base_footprint";
+    odometry_msg.child_frame_id.size = strlen(odometry_msg.child_frame_id.data);
+    odometry_msg.child_frame_id.capacity = odometry_msg.child_frame_id.size + 1;
+}
+
+void transport_odometry_publish(void) {
+    pose_estimator_state_t state;
+    app_get_odometry(&state);
+    int64_t time_ns = rmw_uros_epoch_nanos();
+
+    odometry_msg.header.stamp.sec = (int32_t)(time_ns / 1000000000LL);
+    odometry_msg.header.stamp.nanosec = (uint32_t)(time_ns % 1000000000LL);
+
+    odometry_msg.pose.pose.position.x = (double)state.x / 1000.0;
+    odometry_msg.pose.pose.position.y = (double)state.y / 1000.0;
+    odometry_msg.pose.pose.position.z = 0.0;
+
+    odometry_msg.pose.pose.orientation.x = 0.0;
+    odometry_msg.pose.pose.orientation.y = 0.0;
+    odometry_msg.pose.pose.orientation.z = (double)sinf(state.theta / 2.0f);
+    odometry_msg.pose.pose.orientation.w = (double)cosf(state.theta / 2.0f);
+
+    odometry_msg.twist.twist.linear.x = (double)state.vx / 1000.0;
+    odometry_msg.twist.twist.angular.z = (double)state.omega;
+
+    rcl_ret_t ret = rcl_publish(&odometry_publisher, &odometry_msg, NULL);
+    if (ret != RCL_RET_OK) {
+        printf("Error publishing (line %d)\n", __LINE__);
+    }
 }
 
 void transport_parameter_server_init(void *context) {

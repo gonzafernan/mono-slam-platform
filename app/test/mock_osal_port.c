@@ -8,3 +8,7 @@
  */
 
 void osal_task_notify_from_isr(void *task_handle) {}
+
+int osal_queue_receive(void *queue_handle, void *item, unsigned int timeout) {
+    return -1;
+}

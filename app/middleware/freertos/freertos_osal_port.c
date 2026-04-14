@@ -74,5 +74,12 @@ void osal_queue_overwrite(void *queue_handle, void *item) {
 
 int osal_queue_peek(void *queue_handle, void *item, uint32_t timeout) {
     QueueHandle_t xQueue = (QueueHandle_t)queue_handle;
-    return (xQueuePeek(xQueue, item, timeout) == pdTRUE) ? 0 : -1;
+    return (xQueuePeek(xQueue, item, pdMS_TO_TICKS(timeout)) == pdTRUE) ? 0
+                                                                        : -1;
+}
+
+int osal_queue_receive(void *queue_handle, void *item, uint32_t timeout) {
+    QueueHandle_t xQueue = (QueueHandle_t)queue_handle;
+    return (xQueueReceive(xQueue, item, pdMS_TO_TICKS(timeout)) == pdTRUE) ? 0
+                                                                           : -1;
 }

@@ -67,6 +67,7 @@ typedef StaticTask_t osStaticThreadDef_t;
 static transport_context_t transport_context;
 static rcl_timer_t joint_state_publisher_timer;
 static rcl_timer_t imu_publisher_timer;
+static rcl_timer_t odometry_publisher_timer;
 /* USER CODE END Variables */
 /* Definitions for defaultTask */
 osThreadId_t defaultTaskHandle;
@@ -199,11 +200,17 @@ void StartDefaultTask(void *argument)
                             publisher_timer_callback);
     rclc_executor_add_timer(&executor, &imu_publisher_timer);
 
+    rcl_timer_timeout = 20;
+    rclc_timer_init_default(&odometry_publisher_timer, &support, RCL_MS_TO_NS(rcl_timer_timeout),
+                            publisher_timer_callback);
+    rclc_executor_add_timer(&executor, &odometry_publisher_timer);
+
     // create app transport layer
     transport_context.node = &node;
     transport_context.executor = &executor;
     transport_imu_init((void *)&transport_context);
     transport_joint_state_init((void *)&transport_context);
+    transport_odometry_init((void *)&transport_context);
     if (transport_command_joint_space_init((void *)&transport_context) < 0) {
         printf("ERROR: Unable to crete joint space command subscription (line %d).\r\n",
                __LINE__);
@@ -229,6 +236,8 @@ void publisher_timer_callback(rcl_timer_t *timer, int64_t last_call_time) {
         transport_joint_state_publish();
     } else if (timer == &imu_publisher_timer) {
         transport_imu_publish();
+    } else if (timer == &odometry_publisher_timer) {
+        transport_odometry_publish();
     } else {
         printf("Error joint state publisher timer callback execution without handle (line %d)\r\n",
                __LINE__);

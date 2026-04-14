@@ -5,7 +5,9 @@
 
 #include "app_config.h"
 #include "actuator.h"
+#include "app.h"
 #include "imu.h"
+#include "pose_estimator.h"
 
 // supervisor task
 /// Buffer for the supervisor task stack
@@ -99,4 +101,34 @@ StaticQueue_t actuator2_param_queue_cbm;
 freertos_osal_queue_static_attr_t actuator2_param_queue_attr = {
     .queue_buffer = actuator2_param_queue_buffer,
     .cb_mem = &actuator2_param_queue_cbm,
+};
+
+// wheel velocity setpoint mailbox (depth 1)
+uint8_t wheel_vel_setpoint_mailbox_buffer[sizeof(wheel_vel_setpoint_t)];
+StaticQueue_t wheel_vel_setpoint_mailbox_cbm;
+
+freertos_osal_queue_static_attr_t wheel_vel_setpoint_mailbox_attr = {
+    .queue_buffer = wheel_vel_setpoint_mailbox_buffer,
+    .cb_mem = &wheel_vel_setpoint_mailbox_cbm,
+};
+
+// odometry mailbox (depth 1)
+uint8_t odometry_mailbox_buffer[sizeof(pose_estimator_state_t)];
+StaticQueue_t odometry_mailbox_cbm;
+
+freertos_osal_queue_static_attr_t odometry_mailbox_attr = {
+    .queue_buffer = odometry_mailbox_buffer,
+    .cb_mem = &odometry_mailbox_cbm,
+};
+
+// state estimation task
+uint32_t state_estimation_stack_buffer[STATE_ESTIMATION_TASK_STACK_SIZE];
+StaticTask_t state_estimation_task_buffer;
+
+freertos_osal_task_static_attr_t state_estimation_task_attr = {
+    .name = "state_estimation_task",
+    .stack_size = STATE_ESTIMATION_TASK_STACK_SIZE,
+    .priority = osPriorityNormal,
+    .stack = state_estimation_stack_buffer,
+    .cb_mem = &state_estimation_task_buffer,
 };
